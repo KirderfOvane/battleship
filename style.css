@@ -1,0 +1,41 @@
+body {
+  background: darkgray;
+  text-align: center;
+  margin: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  width: 500px;
+  border: 1px solid black;
+  margin: auto;
+  background-color: white;
+}
+
+#cell {
+  width: 50px;
+  height: 50px;
+  border: 1px solid red;
+  cursor: pointer;
+  font-size: 18px;
+  text-align: center;
+  margin: auto;
+}
+
+.hit {
+  background-color: red;
+}
+.miss {
+  background-color: gray;
+}
+.shipPlacement {
+  background-color: green;
+}
+
+#player1-grid {
+  display: grid;
+}
+#player2-grid {
+  display: grid;
+}
