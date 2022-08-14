@@ -6,10 +6,10 @@ class Grid {
     this.gridElement = gridElement;
   }
   draw(gridElement) {
-    console.log("drawing Grid");
+    // console.log("drawing Grid");
     let gridParent;
     if (gridElement.children.length < 2) {
-      console.log("creating gridParent with id: ", this.name);
+      // console.log("creating gridParent with id: ", this.name);
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
       gridParent.setAttribute("class", "grid");
@@ -19,7 +19,7 @@ class Grid {
         gridElement.children[0].style.display = "none";
       }
     } else {
-      console.log("found existing gridParent,setting style to display instead of drawing");
+      // console.log("found existing gridParent,setting style to display instead of drawing");
       if (gridElement.children[0].id === this.name) {
         gridElement.children[1].style.display = "none";
         gridElement.children[0].style.display = "grid";
@@ -48,14 +48,9 @@ class Grid {
         index++;
       }
     }
-    // console.log((gridElement.children[0].style.display = "none"));
-    console.log(gridElement);
-
-    //console.log(this.name);
   }
 
   static cellClicked(event) {
-    console.log(event.target);
     const cellIndex = event.target.getAttribute("cellIndex");
 
     if (game?.phase === "shipPlacement") {
@@ -64,9 +59,13 @@ class Grid {
     if (game?.phase === "gameplay") {
       if (game?.currentPlayer.isHit(cellIndex)) {
         game?.currentPlayer.placeMarker(cellIndex, "hit");
+        game?.displayButtonWithText("Continue");
+        statusText.textContent = `${game?.currentPlayer.name} hit!`;
       } else {
         console.log("miss", cellIndex);
         game?.currentPlayer.placeMarker(cellIndex, "miss");
+        game?.displayButtonWithText("Continue");
+        statusText.textContent = `${game?.currentPlayer.name} miss!`;
       }
     }
   }

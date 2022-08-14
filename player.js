@@ -22,6 +22,14 @@ class Player {
     return hit;
   }
 
+  resetMarkers() {
+    console.log("resetting markers");
+    this.markings = new Array(100);
+    for (let i = 0; i < 100; i++) {
+      this.grid.gridElement.children[this.playerId].children[i].setAttribute("class", "empty");
+    }
+  }
+
   placeMarker(cellIndex, type) {
     this.markings[cellIndex] = type;
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", type);
@@ -29,9 +37,6 @@ class Player {
   checkShipSinked() {}
 
   placeShip(cellIndex) {
-    /*  console.log(this.ships, this.shipNumber, this.shipCells);
-    console.log(this.ships[0].cells[4]);
-    console.log(this.ships[this.shipNumber].cells[this.shipCells]); */
     const cells = this.ships[this.shipNumber].cells;
     let shipDirection = "";
 
@@ -58,21 +63,21 @@ class Player {
       if (this.shipNumber === 5) {
         if (this.name === "player2") {
           console.log("shipPlacement complete");
-          game?.startGamePhase();
+
+          statusText.textContent = `Ship placement complete!`;
+          game?.newPhase("shipPlacement_completed");
           return;
         } else {
           console.log("first player finished");
           game?.changePlayer();
-          //game?.startShipPlacementPhase();
           return;
         }
       }
-      // console.log(this.ships, this.shipNumber);
+
       statusText.textContent = `${this.name}'s turn to place ${this.ships[this.shipNumber].type}`;
       this.shipCells = ships[this.shipNumber].cells.length;
     }
     this.shipCells--;
-    // console.log(this.shipCells);
   }
 
   isVerticalAdjacent(cellIndex, cells) {
