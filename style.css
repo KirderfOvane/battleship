@@ -12,6 +12,9 @@ body {
   margin: auto;
   background-color: white;
 }
+.hiddenGrid {
+  display: "none";
+}
 
 #cell {
   width: 50px;

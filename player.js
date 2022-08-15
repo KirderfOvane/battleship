@@ -5,13 +5,29 @@ class Player {
     this.grid = grid;
     this.ships = ships;
     this.shipNumber = 0;
-    this.shipCells = ships[this.shipNumber].cells.length - 1;
+    //this.shipCells = ships[this.shipNumber].cells.length - 1;
+    this.shipCells = ships.getShipCells()[this.shipNumber].length - 1;
     this.markings = new Array(100);
   }
-  isHit(cellIndex) {
-    let hit = false;
 
-    const scanShips = ships.map((ship) =>
+  isHit(cellIndex) {
+    console.log(this.name + ":", this.ships);
+    console.log(" carrier: ", this.ships.carrier.cells);
+    console.log(" battleship: ", this.ships.battleship.cells);
+    console.log(" cruiser: ", this.ships.cruiser.cells);
+    console.log(" submarine: ", this.ships.submarine.cells);
+    console.log(" destroyer: ", this.ships.destroyer.cells);
+    console.log(game?.currentPlayer.name === "player1" ? "player2" : "player1");
+
+    const opponentShips = game[this.name === "player1" ? "player2" : "player1"].ships;
+    console.log("opponent carrier: ", opponentShips.carrier.cells);
+    console.log("opponent battleship: ", opponentShips.battleship.cells);
+    console.log("opponent cruiser: ", opponentShips.cruiser.cells);
+    console.log("opponent submarine: ", opponentShips.submarine.cells);
+    console.log("opponent destroyer: ", opponentShips.destroyer.cells);
+
+    let hit = false;
+    const scanShips = opponentShips.map((ship) =>
       ship.cells.filter((cell) => cell.toString() === cellIndex)
     );
     scanShips.forEach((ship) => {
@@ -37,7 +53,10 @@ class Player {
   checkShipSinked() {}
 
   placeShip(cellIndex) {
-    const cells = this.ships[this.shipNumber].cells;
+    //  console.log(this.shipCells);
+    const cells = this.ships.getShipCells()[this.shipNumber];
+    // const cells = this.ships[this.shipNumber].cells;
+
     let shipDirection = "";
 
     // logic that verifies cellIndex is adjacent to rest of indexes. After second
@@ -55,7 +74,7 @@ class Player {
       }
     }
 
-    this.ships[this.shipNumber].cells[this.shipCells] = cellIndex;
+    this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
     this.placeMarker(cellIndex, "shipPlacement");
 
     if (this.shipCells === 0) {
@@ -73,11 +92,15 @@ class Player {
           return;
         }
       }
-
-      statusText.textContent = `${this.name}'s turn to place ${this.ships[this.shipNumber].type}`;
-      this.shipCells = ships[this.shipNumber].cells.length;
+      console.log(this.ships, this.shipNumber);
+      statusText.textContent = `${this.name}'s turn to place ${
+        this.ships.ships[this.shipNumber].type
+      }`;
+      this.shipCells = this.ships.ships[this.shipNumber].cells.length;
+      console.log("changed shipCells: ", this.shipCells);
     }
     this.shipCells--;
+    console.log(cells);
   }
 
   isVerticalAdjacent(cellIndex, cells) {
@@ -106,6 +129,6 @@ class Player {
   }
 
   isNotFirstCell() {
-    return this.shipCells !== ships[this.shipNumber].cells.length - 1;
+    return this.shipCells !== this.ships.getShipCells()[this.shipNumber].length - 1;
   }
 }

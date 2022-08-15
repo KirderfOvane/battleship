@@ -4,6 +4,7 @@ class Grid {
     this.gridSize = gridSize;
     this.cellSize = cellSize;
     this.gridElement = gridElement;
+    this.lastPlayerClicked = undefined;
   }
   draw(gridElement) {
     // console.log("drawing Grid");
@@ -50,23 +51,37 @@ class Grid {
     }
   }
 
-  static cellClicked(event) {
-    const cellIndex = event.target.getAttribute("cellIndex");
+  static hideAllGrids() {
+    grid.style.display = "none";
+  }
+  static showAllGrids() {
+    grid.style.display = "block";
+  }
 
+  static cellClicked = (event) => {
+    const cellIndex = event.target.getAttribute("cellIndex");
     if (game?.phase === "shipPlacement") {
       game?.currentPlayer.placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {
-      if (game?.currentPlayer.isHit(cellIndex)) {
-        game?.currentPlayer.placeMarker(cellIndex, "hit");
-        game?.displayButtonWithText("Continue");
-        statusText.textContent = `${game?.currentPlayer.name} hit!`;
+      if (!this.lastPlayerClicked || this.lastPlayerClicked !== game?.currentPlayer.name) {
+        this.lastPlayerClicked = game?.currentPlayer.name;
+        const opponent = game?.currentPlayer.name === "player1" ? "player2" : "player1";
+        console.log(game[opponent].ships);
+        console.log(game[opponent].ships.isShipHit(cellIndex));
+        if (game[opponent].ships.isShipHit(cellIndex)) {
+          game?.currentPlayer.placeMarker(cellIndex, "hit");
+          game?.displayButtonWithText("Continue");
+          statusText.textContent = `${game?.currentPlayer.name} hit!`;
+        } else {
+          console.log("miss", cellIndex);
+          game?.currentPlayer.placeMarker(cellIndex, "miss");
+          game?.displayButtonWithText("Continue");
+          statusText.textContent = `${game?.currentPlayer.name} miss!`;
+        }
       } else {
-        console.log("miss", cellIndex);
-        game?.currentPlayer.placeMarker(cellIndex, "miss");
-        game?.displayButtonWithText("Continue");
-        statusText.textContent = `${game?.currentPlayer.name} miss!`;
+        this.hideAllGrids();
       }
     }
-  }
+  };
 }
