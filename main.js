@@ -8,35 +8,6 @@ const gridNotation = [
   ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
   ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
 ];
-class Ships {
-  constructor(owner) {
-    this.owner = owner;
-    this.carrier = { type: "carrier", cells: ["0", "0", "0", "0", "0"] };
-    this.battleship = { type: "battleship", cells: ["0", "0", "0", "0"] };
-    this.cruiser = { type: "cruiser", cells: ["0", "0", "0"] };
-    this.submarine = { type: "submarine", cells: ["0", "0", "0"] };
-    this.destroyer = { type: "destroyer", cells: ["0", "0"] };
-    this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
-  }
-  getShipCells() {
-    return this.ships.map((ship) => ship.cells);
-  }
-  setShipCell(shipNumber, cell, newValue) {
-    this.ships[shipNumber].cells[cell] = newValue;
-  }
-  isShipHit(cellIndex) {
-    let hit = false;
-    const scanShips = this.ships.map((ship) =>
-      ship.cells.filter((cell) => cell.toString() === cellIndex)
-    );
-    scanShips.forEach((ship) => {
-      if (ship.length > 0) {
-        hit = true;
-      }
-    });
-    return hit;
-  }
-}
 
 class initializeGame {
   constructor(grid, button) {
@@ -124,7 +95,6 @@ class initializeGame {
   restartGame() {}
   checkWinCondition() {}
   changePlayer() {
-    console.log("changeplayertime");
     if (this.currentPlayer === this.player1) {
       this.currentPlayer = this.player2;
       this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);

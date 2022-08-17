@@ -7,10 +7,8 @@ class Grid {
     this.lastPlayerClicked = undefined;
   }
   draw(gridElement) {
-    // console.log("drawing Grid");
     let gridParent;
     if (gridElement.children.length < 2) {
-      // console.log("creating gridParent with id: ", this.name);
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
       gridParent.setAttribute("class", "grid");
@@ -20,7 +18,7 @@ class Grid {
         gridElement.children[0].style.display = "none";
       }
     } else {
-      // console.log("found existing gridParent,setting style to display instead of drawing");
+      // found existing gridParent,setting style to display instead of drawing
       if (gridElement.children[0].id === this.name) {
         gridElement.children[1].style.display = "none";
         gridElement.children[0].style.display = "grid";
@@ -64,17 +62,35 @@ class Grid {
       game?.currentPlayer.placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {
+      // check that it's not next users turn
       if (!this.lastPlayerClicked || this.lastPlayerClicked !== game?.currentPlayer.name) {
+        // no action if cellindex is already marked
+        if (game?.currentPlayer.markings[cellIndex]) {
+          return;
+        }
+        // set lastplayerclicked-state to be able to keep track of who's turn it is.
         this.lastPlayerClicked = game?.currentPlayer.name;
+
+        // find out who is the opponent of the current active player
         const opponent = game?.currentPlayer.name === "player1" ? "player2" : "player1";
-        console.log(game[opponent].ships);
-        console.log(game[opponent].ships.isShipHit(cellIndex));
-        if (game[opponent].ships.isShipHit(cellIndex)) {
+
+        // check if cell clicked is a hit and act
+        // make the shot,which returns {isHit:boolean, sanked:boolean}
+        const shot = game[opponent].ships.shot(cellIndex);
+
+        if (shot.isHit) {
           game?.currentPlayer.placeMarker(cellIndex, "hit");
+
+          if (shot.sanked) {
+            statusText.textContent = `${game?.currentPlayer.name} hit and sanked ship!`;
+            game?.currentPlayer.displayShipSankedMarker(
+              game[opponent].ships.ships[shot.shipNumber].cells
+            );
+          } else {
+            statusText.textContent = `${game?.currentPlayer.name} hit!`;
+          }
           game?.displayButtonWithText("Continue");
-          statusText.textContent = `${game?.currentPlayer.name} hit!`;
         } else {
-          console.log("miss", cellIndex);
           game?.currentPlayer.placeMarker(cellIndex, "miss");
           game?.displayButtonWithText("Continue");
           statusText.textContent = `${game?.currentPlayer.name} miss!`;
