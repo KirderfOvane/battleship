@@ -86,6 +86,10 @@ class Grid {
             game?.currentPlayer.displayShipSankedMarker(
               game[opponent].ships.ships[shot.shipNumber].cells
             );
+            if (game?.checkWinCondition(game[opponent].ships.ships)) {
+              statusText.textContent = `${game?.currentPlayer.name} won!`;
+              this.hideAllGrids();
+            }
           } else {
             statusText.textContent = `${game?.currentPlayer.name} hit!`;
           }

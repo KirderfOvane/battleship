@@ -93,7 +93,18 @@ class initializeGame {
     this.button.removeEventListener("click", this.buttonPressed);
   }
   restartGame() {}
-  checkWinCondition() {}
+  checkWinCondition(opponentsShips) {
+    let shipSankedCount = opponentsShips.length;
+    for (let i = 0; i < opponentsShips.length; i++) {
+      if (opponentsShips[i].cells.length === opponentsShips[i].hits.length) {
+        shipSankedCount--;
+        if (shipSankedCount < 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   changePlayer() {
     if (this.currentPlayer === this.player1) {
       this.currentPlayer = this.player2;
