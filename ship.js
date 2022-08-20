@@ -7,6 +7,8 @@ class Ships {
     this.submarine = { type: "submarine", cells: ["0", "0", "0"], hits: [] };
     this.destroyer = { type: "destroyer", cells: ["0", "0"], hits: [] };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
+    this.isVertical = false;
+    this.isHorizontal = false;
   }
   initShips() {
     console.log("resetting ships for player: ", this.owner);

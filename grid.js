@@ -58,6 +58,9 @@ class Grid {
 
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
+    console.log("phase:", game?.phase);
+    console.log("cellindex", cellIndex);
+    console.log(game?.currentPlayer.markings);
 
     if (game?.phase === "shipPlacement") {
       game?.currentPlayer.placeShip(cellIndex);
@@ -91,6 +94,7 @@ class Grid {
               statusText.textContent = `${game?.currentPlayer.name} won!`;
               game?.newPhase("end");
               this.hideAllGrids();
+              this.lastPlayerClicked = undefined;
               return;
             }
           } else {

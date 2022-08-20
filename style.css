@@ -34,6 +34,9 @@ body {
 }
 .shipPlacement {
   background-color: green;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .empty {
   background-color: "inherit";
@@ -56,4 +59,21 @@ body {
 
 .sanked {
   background-color: black;
+}
+.startimage {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.middleimage {
+  background-color: rgb(216, 43, 133);
+}
+.endimage {
+  background-color: cornflowerblue;
+}
+.vertical {
+  font-size: 0px !important;
+}
+.horizontal {
+  font-size: 25px !important;
 }
