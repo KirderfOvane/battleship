@@ -8,6 +8,15 @@ class Ships {
     this.destroyer = { type: "destroyer", cells: ["0", "0"], hits: [] };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
   }
+  initShips() {
+    console.log("resetting ships for player: ", this.owner);
+    this.carrier = { type: "carrier", cells: ["0", "0", "0", "0", "0"], hits: [] };
+    this.battleship = { type: "battleship", cells: ["0", "0", "0", "0"], hits: [] };
+    this.cruiser = { type: "cruiser", cells: ["0", "0", "0"], hits: [] };
+    this.submarine = { type: "submarine", cells: ["0", "0", "0"], hits: [] };
+    this.destroyer = { type: "destroyer", cells: ["0", "0"], hits: [] };
+    this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
+  }
   getShipCells() {
     return this.ships.map((ship) => ship.cells);
   }

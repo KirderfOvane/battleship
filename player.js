@@ -17,6 +17,11 @@ class Player {
     }
   }
 
+  resetShip() {
+    this.shipNumber = 0;
+    this.shipCells = this.ships.getShipCells()[this.shipNumber].length - 1;
+  }
+
   placeMarker(cellIndex, type) {
     this.markings[cellIndex] = type;
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", type);

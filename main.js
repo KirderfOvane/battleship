@@ -35,6 +35,9 @@ class initializeGame {
       case "end":
         this.endGame();
         break;
+      case "init":
+        this.startShipPlacement();
+        break;
     }
   }
 
@@ -73,6 +76,13 @@ class initializeGame {
     if (this.phase === "gameplay") {
       this.changePlayer();
     }
+
+    if (this.phase === "end") {
+      this.resetGame();
+    }
+    if (this.phase === "init") {
+      this.newPhase("init");
+    }
   };
   startGamePlayPrompt() {
     this.phase = "shipPlacement_completed";
@@ -89,10 +99,22 @@ class initializeGame {
   }
 
   endGame() {
-    this.phase = "init";
-    this.button.removeEventListener("click", this.buttonPressed);
+    this.phase = "end";
+    this.displayButtonWithText("Restart Game");
   }
-  restartGame() {}
+
+  resetGame() {
+    this.phase = "init";
+    // reset ships,cells, hits & markings
+    this.player1.resetMarkers();
+    this.player2.resetMarkers();
+    this.currentPlayer.ships.initShips();
+    this.currentPlayer.resetShip();
+    this.changePlayer();
+    this.currentPlayer.ships.initShips();
+    this.currentPlayer.resetShip();
+    this.changePlayer("player1");
+  }
   checkWinCondition(opponentsShips) {
     let shipSankedCount = opponentsShips.length;
     for (let i = 0; i < opponentsShips.length; i++) {
@@ -105,17 +127,29 @@ class initializeGame {
     }
     return false;
   }
-  changePlayer() {
-    if (this.currentPlayer === this.player1) {
-      this.currentPlayer = this.player2;
-      this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-      grid.style.display = "grid";
+  changePlayer(player) {
+    if (player) {
+      if (player === "player1") {
+        this.currentPlayer = this.player1;
+        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
+        grid.style.display = "grid";
+      } else {
+        this.currentPlayer = this.player2;
+        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
+        grid.style.display = "grid";
+      }
     } else {
-      this.currentPlayer = this.player1;
-      this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-      grid.style.display = "grid";
+      if (this.currentPlayer === this.player1) {
+        this.currentPlayer = this.player2;
+        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
+        grid.style.display = "grid";
+      } else {
+        this.currentPlayer = this.player1;
+        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
+        grid.style.display = "grid";
+      }
+      statusText.textContent = `${this.currentPlayer.name}'s turn`;
     }
-    statusText.textContent = `${this.currentPlayer.name}'s turn`;
   }
 }
 
