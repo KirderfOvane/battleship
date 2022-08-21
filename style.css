@@ -72,6 +72,7 @@ body {
   background-color: cornflowerblue;
 }
 .vertical {
+  transform: rotate(90deg);
   font-size: 0px !important;
 }
 .horizontal {

@@ -29,13 +29,30 @@ class Player {
     console.log("shiptype num of cells: ");
     console.log(this.ships.ships[type].cells.length - shipCell - 1);
     const shipTypeName = this.ships.ships[type].type;
+    const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
+    let firstCellIndex;
+    console.log("imageNumber: ", imageNumber);
+    console.log("shipcelllength: ", shipCellLength);
+    // image rotation is decided by the ships placement direction
+    const imageRotation = this.ships.isVertical ? "vertical" : "horizontal";
+    console.log(imageRotation);
+    // imageRotation is decided on the second placement
+    // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
+    // and change index 0 to be rotated vertical
+    if (imageRotation === "vertical" && imageNumber === 2) {
+      firstCellIndex = this.ships.ships[type].cells[shipCellLength - 1];
+      console.log(this.ships.ships[type]);
+      console.log("type: ", type);
+      console.log("firstcellindex:", firstCellIndex);
+      this.placeMarker(firstCellIndex, type, shipCellLength - 1);
+    }
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
     console.log(urlString);
     this.markings[cellIndex] = type;
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute(
       "class",
-      "shipPlacement"
+      `shipPlacement ${imageRotation}`
     );
     this.grid.gridElement.children[this.playerId].children[cellIndex].style.backgroundImage =
       urlString;
