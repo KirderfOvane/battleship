@@ -83,12 +83,13 @@ class Grid {
         const shot = game[opponent].ships.shot(cellIndex);
 
         if (shot.isHit) {
-          game?.currentPlayer.placeMarker(cellIndex, "hit");
+          game?.currentPlayer.placeHitMarker(cellIndex);
 
           if (shot.sanked) {
             statusText.textContent = `${game?.currentPlayer.name} hit and sanked ship!`;
             game?.currentPlayer.displayShipSankedMarker(
-              game[opponent].ships.ships[shot.shipNumber].cells
+              game[opponent].ships.ships[shot.shipNumber].cells,
+              shot.shipNumber
             );
             if (game?.checkWinCondition(game[opponent].ships.ships)) {
               statusText.textContent = `${game?.currentPlayer.name} won!`;
@@ -102,7 +103,7 @@ class Grid {
           }
           game?.displayButtonWithText("Continue");
         } else {
-          game?.currentPlayer.placeMarker(cellIndex, "miss");
+          game?.currentPlayer.placeMissMarker(cellIndex);
           game?.displayButtonWithText("Continue");
           statusText.textContent = `${game?.currentPlayer.name} miss!`;
         }

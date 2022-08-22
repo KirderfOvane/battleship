@@ -14,6 +14,7 @@ class Player {
     this.markings = new Array(100);
     for (let i = 0; i < 100; i++) {
       this.grid.gridElement.children[this.playerId].children[i].setAttribute("class", "empty");
+      this.grid.gridElement.children[this.playerId].children[i].style.backgroundImage = "unset";
     }
   }
 
@@ -22,8 +23,15 @@ class Player {
     this.shipCells = this.ships.getShipCells()[this.shipNumber].length - 1;
   }
 
-  placeMarker(cellIndex, type, shipCell) {
-    console.log("placemarker", cellIndex, type, shipCell);
+  placeHitMarker(cellIndex) {
+    this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `hit`);
+  }
+  placeMissMarker(cellIndex) {
+    this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `miss`);
+  }
+
+  placeShipMarker(cellIndex, type, shipCell) {
+    console.log("placeShipMarker", cellIndex, type, shipCell);
     console.log(this.ships.ships[type].type);
     console.log(this.ships.ships[type].cells[shipCell]);
     console.log("shiptype num of cells: ");
@@ -45,7 +53,7 @@ class Player {
       console.log(this.ships.ships[type]);
       console.log("type: ", type);
       console.log("firstcellindex:", firstCellIndex);
-      this.placeMarker(firstCellIndex, type, shipCellLength - 1);
+      this.placeShipMarker(firstCellIndex, type, shipCellLength - 1);
     }
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
     console.log(urlString);
@@ -58,8 +66,8 @@ class Player {
       urlString;
   }
 
-  displayShipSankedMarker(shipIndexes) {
-    const activeShip = this.ships.ships[this.shipNumber];
+  displayShipSankedMarker(shipIndexes, shipNum) {
+    const activeShip = this.ships.ships[shipNum];
     // image rotation is decided by the ships placement direction
     const imageRotation = activeShip.isVertical ? "vertical" : "horizontal";
     console.log(imageRotation);
@@ -130,7 +138,7 @@ class Player {
     }
 
     this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
-    this.placeMarker(cellIndex, this.shipNumber, this.shipCells);
+    this.placeShipMarker(cellIndex, this.shipNumber, this.shipCells);
 
     if (this.shipCells === 0) {
       this.shipNumber++;

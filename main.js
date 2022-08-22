@@ -85,6 +85,7 @@ class initializeGame {
       this.newPhase("init");
     }
   };
+
   startGamePlayPrompt() {
     this.phase = "shipPlacement_completed";
     grid.style.display = "none";
