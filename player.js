@@ -67,40 +67,10 @@ class Player {
   }
 
   displayShipSankedMarker(shipIndexes, shipNum) {
-    const activeShip = this.ships.ships[shipNum];
-    const shipTypeName = activeShip.type;
-    // image rotation is decided by the ships placement direction
-    const imageRotation = activeShip.isVertical ? "vertical" : "horizontal";
-    console.log(imageRotation);
-    console.log("vert?", activeShip.isVertical);
-    console.log("horizont?", activeShip.isHorizontal);
-    // on each index of the ship set a class on the grid
+    // on each index of the ship placeShipMarker
     for (let i = 0; i < shipIndexes.length; i++) {
       console.log("shipCell?", i);
       this.placeShipMarker(shipIndexes[i], shipNum, i);
-      /* console.log(i, shipIndexes[i], activeShip, imageRotation, shipTypeName);
-      // find out if startindex, then add startimage
-      if (i === 0) {
-        console.log("found startindex");
-        this.grid.gridElement.children[this.playerId].children[shipIndexes[i]].setAttribute(
-          "class",
-          `sanked startimage ${imageRotation}`
-        );
-      }
-      // find out if endindex, then add the endimage
-      else if (i === shipIndexes.length - 1) {
-        console.log("found endindex");
-        this.grid.gridElement.children[this.playerId].children[shipIndexes[i]].setAttribute(
-          "class",
-          `sanked endimage ${imageRotation}`
-        );
-      } else {
-        // if none of above it's middleimage
-        this.grid.gridElement.children[this.playerId].children[shipIndexes[i]].setAttribute(
-          "class",
-          `sanked middleimage ${imageRotation}`
-        );
-      } */
     }
   }
 
