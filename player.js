@@ -43,7 +43,7 @@ class Player {
     console.log("imageNumber: ", imageNumber);
     console.log("shipcelllength: ", shipCellLength);
     // image rotation is decided by the ships placement direction
-    const imageRotation = this.ships.ships[this.shipNumber].isVertical ? "vertical" : "horizontal";
+    const imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
     console.log(imageRotation);
     // imageRotation is decided on the second placement
     // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
@@ -68,6 +68,7 @@ class Player {
 
   displayShipSankedMarker(shipIndexes, shipNum) {
     const activeShip = this.ships.ships[shipNum];
+    const shipTypeName = activeShip.type;
     // image rotation is decided by the ships placement direction
     const imageRotation = activeShip.isVertical ? "vertical" : "horizontal";
     console.log(imageRotation);
@@ -75,7 +76,9 @@ class Player {
     console.log("horizont?", activeShip.isHorizontal);
     // on each index of the ship set a class on the grid
     for (let i = 0; i < shipIndexes.length; i++) {
-      console.log(i, shipIndexes[i]);
+      console.log("shipCell?", i);
+      this.placeShipMarker(shipIndexes[i], shipNum, i);
+      /* console.log(i, shipIndexes[i], activeShip, imageRotation, shipTypeName);
       // find out if startindex, then add startimage
       if (i === 0) {
         console.log("found startindex");
@@ -97,7 +100,7 @@ class Player {
           "class",
           `sanked middleimage ${imageRotation}`
         );
-      }
+      } */
     }
   }
 
