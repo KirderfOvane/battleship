@@ -43,8 +43,19 @@ class Player {
     console.log("imageNumber: ", imageNumber);
     console.log("shipcelllength: ", shipCellLength);
     // image rotation is decided by the ships placement direction
-    const imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
-    console.log(imageRotation);
+    let imageRotation;
+    if (game?.phase === "shipPlacement") {
+      imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
+      console.log(imageRotation);
+    } else {
+      // phase is gameplay,so should lookup enemy ships position.
+      const opponent = this.name === "player1" ? "player2" : "player1";
+      const opponentShip = game[opponent].ships.ships[type];
+      console.log("placement in gameplay phase: ", opponent, opponentShip);
+      imageRotation = opponentShip.isVertical ? "vertical" : "horizontal";
+      console.log(imageRotation);
+    }
+
     // imageRotation is decided on the second placement
     // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
     // and change index 0 to be rotated vertical
