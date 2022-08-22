@@ -1,14 +1,42 @@
 class Ships {
   constructor(owner) {
     this.owner = owner;
-    this.carrier = { type: "carrier", cells: ["0", "0", "0", "0", "0"], hits: [] };
-    this.battleship = { type: "battleship", cells: ["0", "0", "0", "0"], hits: [] };
-    this.cruiser = { type: "cruiser", cells: ["0", "0", "0"], hits: [] };
-    this.submarine = { type: "submarine", cells: ["0", "0", "0"], hits: [] };
-    this.destroyer = { type: "destroyer", cells: ["0", "0"], hits: [] };
+    this.carrier = {
+      type: "carrier",
+      cells: ["0", "0", "0", "0", "0"],
+      hits: [],
+      isVertical: false,
+      isHorizontal: false,
+    };
+    this.battleship = {
+      type: "battleship",
+      cells: ["0", "0", "0", "0"],
+      hits: [],
+      isVertical: false,
+      isHorizontal: false,
+    };
+    this.cruiser = {
+      type: "cruiser",
+      cells: ["0", "0", "0"],
+      hits: [],
+      isVertical: false,
+      isHorizontal: false,
+    };
+    this.submarine = {
+      type: "submarine",
+      cells: ["0", "0", "0"],
+      hits: [],
+      isVertical: false,
+      isHorizontal: false,
+    };
+    this.destroyer = {
+      type: "destroyer",
+      cells: ["0", "0"],
+      hits: [],
+      isVertical: false,
+      isHorizontal: false,
+    };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
-    this.isVertical = false;
-    this.isHorizontal = false;
   }
   initShips() {
     console.log("resetting ships for player: ", this.owner);

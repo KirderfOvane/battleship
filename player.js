@@ -35,7 +35,7 @@ class Player {
     console.log("imageNumber: ", imageNumber);
     console.log("shipcelllength: ", shipCellLength);
     // image rotation is decided by the ships placement direction
-    const imageRotation = this.ships.isVertical ? "vertical" : "horizontal";
+    const imageRotation = this.ships.ships[this.shipNumber].isVertical ? "vertical" : "horizontal";
     console.log(imageRotation);
     // imageRotation is decided on the second placement
     // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
@@ -59,11 +59,12 @@ class Player {
   }
 
   displayShipSankedMarker(shipIndexes) {
+    const activeShip = this.ships.ships[this.shipNumber];
     // image rotation is decided by the ships placement direction
-    const imageRotation = this.ships.isVertical ? "vertical" : "horizontal";
+    const imageRotation = activeShip.isVertical ? "vertical" : "horizontal";
     console.log(imageRotation);
-    console.log("vert?", this.ships.isVertical);
-    console.log("horizont?", this.ships.isHorizontal);
+    console.log("vert?", activeShip.isVertical);
+    console.log("horizont?", activeShip.isHorizontal);
     // on each index of the ship set a class on the grid
     for (let i = 0; i < shipIndexes.length; i++) {
       console.log(i, shipIndexes[i]);
@@ -94,6 +95,7 @@ class Player {
 
   placeShip(cellIndex) {
     const cells = this.ships.getShipCells()[this.shipNumber];
+    const activeShip = this.ships.ships[this.shipNumber];
 
     // Gaurd logic that verifies cellIndex is adjacent to rest of indexes. After second
     // cellIndex in one ship the direction of the ship is also decided and all other indexes in
@@ -101,11 +103,11 @@ class Player {
     if (this.isNotFirstCell()) {
       // if both isvertical and ishorizontal is false , then it's the second placement and we
       // need to decide an placement direction
-      if (!this.ships.isVertical && !this.ships.isHorizontal) {
-        if (this.isVerticalAdjacent(cellIndex, cells) && this.ships.isHorizontal === false) {
-          this.ships.isVertical = true;
-        } else if (this.isHorizontalAdjacent(cellIndex, cells) && this.ships.isVertical === false) {
-          this.ships.isHorizontal = true;
+      if (!activeShip.isVertical && !activeShip.isHorizontal) {
+        if (this.isVerticalAdjacent(cellIndex, cells) && activeShip.isHorizontal === false) {
+          activeShip.isVertical = true;
+        } else if (this.isHorizontalAdjacent(cellIndex, cells) && activeShip.isVertical === false) {
+          activeShip.isHorizontal = true;
         } else {
           // not a valid placement
           console.log("not valid");
@@ -115,9 +117,9 @@ class Player {
         // this is the third cell or more placed.
         // Make sure the new clicked cell is vertical if this.ships.isVertical
         // or make sure the new clicked cell is horizontal if this.ships.isHorizontal
-        if (this.ships.isVertical && this.isVerticalAdjacent(cellIndex, cells)) {
+        if (activeShip.isVertical && this.isVerticalAdjacent(cellIndex, cells)) {
           console.log("valid vertical placement");
-        } else if (this.ships.isHorizontal && this.isHorizontalAdjacent(cellIndex, cells)) {
+        } else if (activeShip.isHorizontal && this.isHorizontalAdjacent(cellIndex, cells)) {
           console.log("valid horizontal placement");
         } else {
           console.log("not a valid placement");
