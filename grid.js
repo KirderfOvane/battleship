@@ -58,9 +58,6 @@ class Grid {
 
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
-    console.log("phase:", game?.phase);
-    console.log("cellindex", cellIndex);
-    console.log(game?.currentPlayer.markings);
 
     if (game?.phase === "shipPlacement") {
       game?.currentPlayer.placeShip(cellIndex);

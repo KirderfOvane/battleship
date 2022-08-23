@@ -40,44 +40,35 @@ class Player {
     // and change index 0 to be rotated vertical
     let firstCellIndex;
     firstCellIndex = ship.cells[shipCellLength - 1];
-    console.log(ship.type);
-    console.log("type: ", type);
-    console.log("firstcellindex:", firstCellIndex);
+
     this.placeShipMarker(firstCellIndex, type, shipCellLength - 1);
   }
 
   placeShipMarker(cellIndex, type, shipCell) {
-    console.log("placeShipMarker", cellIndex, type, shipCell);
-    console.log(this.ships.ships[type].type);
-    console.log(this.ships.ships[type].cells[shipCell]);
-    console.log("shiptype num of cells: ");
-    console.log(this.ships.ships[type].cells.length - shipCell - 1);
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
 
-    console.log("imageNumber: ", imageNumber);
-    console.log("shipcelllength: ", shipCellLength);
     // image rotation is decided by the ships placement direction
     let imageRotation;
     if (game?.phase === "shipPlacement") {
       imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
-      console.log(imageRotation);
+
       this.isRotationChanged(imageRotation, imageNumber) &&
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
       // phase is gameplay,so should lookup enemy ships position.
       const opponent = this.name === "player1" ? "player2" : "player1";
       const opponentShip = game[opponent].ships.ships[type];
-      console.log("placement in gameplay phase: ", opponent, opponentShip);
+
       imageRotation = opponentShip.isVertical ? "vertical" : "horizontal";
-      console.log(imageRotation);
+
       this.isRotationChanged(imageRotation, imageNumber) &&
         this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
     }
 
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
-    console.log(urlString);
+
     this.markings[cellIndex] = type;
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute(
       "class",
@@ -90,7 +81,6 @@ class Player {
   displayShipSankedMarker(shipIndexes, shipNum) {
     // on each index of the ship placeShipMarker
     for (let i = 0; i < shipIndexes.length; i++) {
-      console.log("shipCell?", i);
       this.placeShipMarker(shipIndexes[i], shipNum, i);
     }
   }

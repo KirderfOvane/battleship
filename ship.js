@@ -39,7 +39,6 @@ class Ships {
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
   }
   initShips() {
-    console.log("resetting ships for player: ", this.owner);
     this.carrier = {
       type: "carrier",
       cells: ["0", "0", "0", "0", "0"],

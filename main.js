@@ -57,7 +57,6 @@ class initializeGame {
 
   // note the arrow-function to get access to this.
   #buttonPressed = (event) => {
-    console.log("btnpressed phase; ", this.phase);
     if (this.phase === "shipPlacement") {
       this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
       this.currentPlayer.grid.gridElement.style.display = "grid";
