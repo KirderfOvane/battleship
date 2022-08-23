@@ -29,6 +29,22 @@ class Player {
   placeMissMarker(cellIndex) {
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `miss`);
   }
+  isRotationChanged(imageRotation, imageNumber) {
+    return imageRotation === "vertical" && imageNumber === 2;
+  }
+
+  adjustFirstShipCellRotation(ship, type, shipCellLength) {
+    console.log("ADJUSTFIRSTSHIPCELLROTATION: ", ship, type, shipCellLength);
+    // imageRotation is decided on the second placement
+    // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
+    // and change index 0 to be rotated vertical
+    let firstCellIndex;
+    firstCellIndex = ship.cells[shipCellLength - 1];
+    console.log(ship.type);
+    console.log("type: ", type);
+    console.log("firstcellindex:", firstCellIndex);
+    this.placeShipMarker(firstCellIndex, type, shipCellLength - 1);
+  }
 
   placeShipMarker(cellIndex, type, shipCell) {
     console.log("placeShipMarker", cellIndex, type, shipCell);
@@ -39,7 +55,7 @@ class Player {
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
-    let firstCellIndex;
+
     console.log("imageNumber: ", imageNumber);
     console.log("shipcelllength: ", shipCellLength);
     // image rotation is decided by the ships placement direction
@@ -47,6 +63,8 @@ class Player {
     if (game?.phase === "shipPlacement") {
       imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
       console.log(imageRotation);
+      this.isRotationChanged(imageRotation, imageNumber) &&
+        this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
       // phase is gameplay,so should lookup enemy ships position.
       const opponent = this.name === "player1" ? "player2" : "player1";
@@ -54,18 +72,10 @@ class Player {
       console.log("placement in gameplay phase: ", opponent, opponentShip);
       imageRotation = opponentShip.isVertical ? "vertical" : "horizontal";
       console.log(imageRotation);
+      this.isRotationChanged(imageRotation, imageNumber) &&
+        this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
     }
 
-    // imageRotation is decided on the second placement
-    // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
-    // and change index 0 to be rotated vertical
-    if (imageRotation === "vertical" && imageNumber === 2) {
-      firstCellIndex = this.ships.ships[type].cells[shipCellLength - 1];
-      console.log(this.ships.ships[type]);
-      console.log("type: ", type);
-      console.log("firstcellindex:", firstCellIndex);
-      this.placeShipMarker(firstCellIndex, type, shipCellLength - 1);
-    }
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
     console.log(urlString);
     this.markings[cellIndex] = type;
