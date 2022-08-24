@@ -48,6 +48,21 @@ class Grid {
       }
     }
   }
+  getXgridBounds() {
+    const gridXbounds = this.gridSize[0] / this.cellSize[0];
+    const gridYbounds = this.gridSize[1] / this.cellSize[1];
+    const gridCellCount = gridXbounds * gridYbounds;
+
+    const gridXranges = [];
+    const step = gridCellCount / gridXbounds;
+
+    for (let i = 0; i <= gridCellCount; i += step) {
+      gridXranges.push(i);
+    }
+
+    console.log(gridXranges);
+    return gridXranges;
+  }
 
   static hideAllGrids() {
     grid.style.display = "none";

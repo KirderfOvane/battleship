@@ -52,8 +52,8 @@ class Player {
     // image rotation is decided by the ships placement direction
     let imageRotation;
     if (game?.phase === "shipPlacement") {
-      imageRotation = this.ships.ships[type].isVertical ? "vertical" : "horizontal";
-
+      imageRotation = this.ships.ships[type].direction;
+      // console.log("imagerotation:", imageRotation);
       this.isRotationChanged(imageRotation, imageNumber) &&
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
@@ -85,22 +85,103 @@ class Player {
     }
   }
 
-  #isColliding(cellIndex, activeShip) {
-    //console.log(activeShip.cells);
-    // startingPoint for extrapolation
-    const startingPoint = activeShip.cells[activeShip.cells.length - 1];
+  #extrapolate(gridValue, direction) {
+    //  console.log(gridValue, direction);
 
-    for (let i = activeShip.cells.length - 2; i >= 0; i--) {
-      //console.log(i);
-      if (activeShip.isVertical) {
-        if (this.isVerticalUp) {
-          console.log(cellIndex - 10);
+    let extrapolatedNumber;
+    switch (direction) {
+      case "up":
+        extrapolatedNumber = gridValue - 10;
+        break;
+      case "down":
+        extrapolatedNumber = gridValue + 10;
+        break;
+      case "left":
+        extrapolatedNumber = gridValue - 1;
+        break;
+      case "right":
+        extrapolatedNumber = gridValue + 1;
+        break;
+      case "":
+        console.log("ERROR");
+        break;
+    }
+
+    if (extrapolatedNumber > 99) return false;
+    if (extrapolatedNumber < 0) return false;
+    return extrapolatedNumber;
+  }
+
+  #isColliding(gridPoint) {
+    this.ships.getShipCells().map((shipCells) => {
+      if (shipCells.includes(gridPoint)) {
+        console.log("FOUND COLLISION");
+
+        return true;
+      }
+    });
+    return false;
+  }
+
+  #calculatePositions(cellIndex, activeShip) {
+    let extrapolatedGridPoint = null;
+    let collision = false;
+    let positions = [];
+
+    // check cellindex collisions before looping
+    if (this.#isColliding(cellIndex)) return false;
+    positions.push(cellIndex);
+
+    for (let i = activeShip.cells.length - 3; i >= 0; i--) {
+      if (!extrapolatedGridPoint) {
+        extrapolatedGridPoint = this.#extrapolate(parseInt(cellIndex), activeShip.direction);
+      } else {
+        extrapolatedGridPoint = this.#extrapolate(
+          parseInt(extrapolatedGridPoint),
+          activeShip.direction
+        );
+      }
+      if (extrapolatedGridPoint === false) {
+        console.log("FOUND OUT OF GRID-BOUNDS");
+        collision = true;
+        return;
+      }
+      // Gaurd collision-check
+      collision = this.#isColliding(extrapolatedGridPoint);
+      positions.push(extrapolatedGridPoint);
+    }
+    // console.log(activeShip.cells[activeShip.cells.length - 1]);
+    // Gaurd out of x bounds check
+    const res = this.#isOutOfXbounds(activeShip.cells[activeShip.cells.length - 1], positions);
+    if (res) collision = true;
+
+    return collision ? false : positions;
+  }
+
+  #isOutOfXbounds(shipCellOne, restOfShipCells) {
+    let isOutOfXbounds = false;
+    const xRanges = this.grid.getXgridBounds();
+    //console.log(xRanges);
+    // console.log(xRanges.filter((range) => range < 11));
+    for (let i = 1; i < xRanges.length; i++) {
+      console.log(xRanges[i], shipCellOne, xRanges[i] > shipCellOne);
+      if (xRanges[i] > parseInt(shipCellOne)) {
+        console.log("FOUND range", xRanges[i - 1] + "-", xRanges[i]);
+        const test = restOfShipCells.filter((v) => v >= xRanges[i - 1] && v < xRanges[i]);
+        console.log(test.length, restOfShipCells.length);
+        if (test.length !== restOfShipCells.length) {
+          console.log("oh shit, out of bounds!", restOfShipCells.length - test.length);
+          isOutOfXbounds = true;
         }
+        return isOutOfXbounds;
+      } else {
+        continue;
       }
     }
-    // console.log("cells to verify:", activeShip.cells);
-    // console.log(activeShip, cellIndex);
-    return false;
+    return isOutOfXbounds;
+    //console.log(shipCellOne);
+    restOfShipCells.splice(0, 0, shipCellOne);
+    //console.log(restOfShipCells);
   }
 
   placeShip(cellIndex) {
@@ -111,106 +192,92 @@ class Player {
     // cellIndex in one ship the direction of the ship is also decided and all other indexes in
     // the other direction should be scrapped.
     if (this.isNotFirstCell()) {
-      // if both isvertical and ishorizontal is false , then it's the second placement and we
+      // if direction is empty , then it's the second placement and we
       // need to decide an placement direction
-      if (!activeShip.isVertical && !activeShip.isHorizontal) {
-        if (
-          this.isVerticalUp(cellIndex, cells) ||
-          (this.isVerticalDown(cellIndex, cells) && activeShip.isHorizontal === false)
-        ) {
-          activeShip.isVertical = true;
-        } else if (this.isHorizontalAdjacent(cellIndex, cells) && activeShip.isVertical === false) {
-          activeShip.isHorizontal = true;
-        } else {
-          // not a valid placement
-          console.log("not valid");
-          return;
-        }
-      } else {
-        // this is the third cell or more placed.
-        // Make sure the new clicked cell is vertical if this.ships.isVertical
-        // or make sure the new clicked cell is horizontal if this.ships.isHorizontal
-        if (
-          (activeShip.isVertical && this.isVerticalUp(cellIndex, cells)) ||
-          this.isVerticalDown(cellIndex, cells)
-        ) {
-          console.log("valid vertical placement");
-        } else if (activeShip.isHorizontal && this.isHorizontalAdjacent(cellIndex, cells)) {
-          console.log("valid horizontal placement");
-        } else {
-          console.log("not a valid placement");
-          // not a valid placement
-          return;
-        }
+      if (activeShip.direction === "") {
+        this.#setDirection(activeShip, cellIndex, cells);
       }
+      // Now when we know direction we can calculate positions of the ship based on it's cell-length
+      const calculation = this.#calculatePositions(cellIndex, activeShip);
+      console.log(calculation);
+      if (calculation) {
+        // console.log(calculation, this.shipCells, this.shipNumber);
+        calculation.map((pos) => {
+          this.ships.setShipCell(this.shipNumber, this.shipCells, pos);
+          this.placeShipMarker(pos, this.shipNumber, this.shipCells);
+          if (this.shipCells === 0) {
+            this.shipNumber++;
+            if (this.shipNumber === 5) {
+              if (this.name === "player2") {
+                // shipPlacement is complete
 
-      // Gaurd logic that verifies this placement won't cross another ships placement
-      // uses isVertical and isHorizontal for direction
-      if (this.#isColliding(cellIndex, activeShip)) {
-        console.log("collision detected, aborting..");
+                statusText.textContent = `Ship placement complete!`;
+                game?.newPhase("shipPlacement_completed");
+                return;
+              } else {
+                // first player is finished placing ships
+                game?.changePlayer();
+                return;
+              }
+            }
 
-        return;
+            statusText.textContent = `${this.name}'s turn to place ${
+              this.ships.ships[this.shipNumber].type
+            }`;
+            this.shipCells = this.ships.ships[this.shipNumber].cells.length;
+          }
+          this.shipCells--;
+        });
       }
+    } else {
+      this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
+      this.placeShipMarker(cellIndex, this.shipNumber, this.shipCells);
+
+      if (this.shipCells === 0) {
+        this.shipNumber++;
+        if (this.shipNumber === 5) {
+          if (this.name === "player2") {
+            // shipPlacement is complete
+
+            statusText.textContent = `Ship placement complete!`;
+            game?.newPhase("shipPlacement_completed");
+            return;
+          } else {
+            // first player is finished placing ships
+            game?.changePlayer();
+            return;
+          }
+        }
+
+        statusText.textContent = `${this.name}'s turn to place ${
+          this.ships.ships[this.shipNumber].type
+        }`;
+        this.shipCells = this.ships.ships[this.shipNumber].cells.length;
+      }
+      this.shipCells--;
     }
-
-    this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
-    this.placeShipMarker(cellIndex, this.shipNumber, this.shipCells);
-
-    if (this.shipCells === 0) {
-      this.shipNumber++;
-      if (this.shipNumber === 5) {
-        if (this.name === "player2") {
-          // shipPlacement is complete
-
-          statusText.textContent = `Ship placement complete!`;
-          game?.newPhase("shipPlacement_completed");
-          return;
-        } else {
-          // first player is finished placing ships
-          game?.changePlayer();
-          return;
-        }
-      }
-
-      statusText.textContent = `${this.name}'s turn to place ${
-        this.ships.ships[this.shipNumber].type
-      }`;
-      this.shipCells = this.ships.ships[this.shipNumber].cells.length;
-    }
-    this.shipCells--;
   }
 
-  isVerticalUp(cellIndex, cells) {
+  #setDirection(activeShip, cellIndex, cells) {
     const adjacentUpCell = parseInt(cells[this.shipCells + 1]) - 10;
-
-    if (parseInt(cellIndex) === adjacentUpCell) {
-      console.log("vertical placement detected");
-      return true;
-    } else {
-      console.log("horizontal placement detected");
-      return false;
-    }
-  }
-  isVerticalDown(cellIndex, cells) {
     const adjacentDownCell = parseInt(cells[this.shipCells + 1]) + 10;
-    if (parseInt(cellIndex) === adjacentDownCell) {
-      console.log("vertical placement detected");
-      return true;
-    } else {
-      console.log("horizontal placement detected");
-      return false;
-    }
-  }
-
-  isHorizontalAdjacent(cellIndex, cells) {
     const adjacentLeftCell = parseInt(cells[this.shipCells + 1]) - 1;
     const adjacentRightCell = parseInt(cells[this.shipCells + 1]) + 1;
-
-    if (parseInt(cellIndex) === adjacentLeftCell || parseInt(cellIndex) === adjacentRightCell) {
-      console.log("horizontal is verified ");
-      return true;
-    } else {
-      return false;
+    if (parseInt(cellIndex) === adjacentUpCell) {
+      activeShip.direction = "up";
+      return;
+    }
+    if (parseInt(cellIndex) === adjacentDownCell) {
+      activeShip.direction = "down";
+      return;
+    }
+    if (parseInt(cellIndex) === adjacentLeftCell) {
+      activeShip.direction = "left";
+      return;
+    }
+    if (parseInt(cellIndex) === adjacentRightCell) {
+      activeShip.direction = "right";
+      return;
     }
   }
 
