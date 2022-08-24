@@ -3,76 +3,86 @@ class Ships {
     this.owner = owner;
     this.carrier = {
       type: "carrier",
-      cells: ["0", "0", "0", "0", "0"],
+      cells: ["-1", "-1", "-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.battleship = {
       type: "battleship",
-      cells: ["0", "0", "0", "0"],
+      cells: ["-1", "-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.cruiser = {
       type: "cruiser",
-      cells: ["0", "0", "0"],
+      cells: ["-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.submarine = {
       type: "submarine",
-      cells: ["0", "0", "0"],
+      cells: ["-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.destroyer = {
       type: "destroyer",
-      cells: ["0", "0"],
+      cells: ["-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
   }
   initShips() {
     this.carrier = {
       type: "carrier",
-      cells: ["0", "0", "0", "0", "0"],
+      cells: ["-1", "-1", "-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.battleship = {
       type: "battleship",
-      cells: ["0", "0", "0", "0"],
+      cells: ["-1", "-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.cruiser = {
       type: "cruiser",
-      cells: ["0", "0", "0"],
+      cells: ["-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.submarine = {
       type: "submarine",
-      cells: ["0", "0", "0"],
+      cells: ["-1", "-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.destroyer = {
       type: "destroyer",
-      cells: ["0", "0"],
+      cells: ["-1", "-1"],
       hits: [],
       isVertical: false,
       isHorizontal: false,
+      direction: "",
     };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
   }

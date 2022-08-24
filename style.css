@@ -71,10 +71,17 @@ body {
 .endimage {
   background-color: cornflowerblue;
 }
-.vertical {
+.vertical_down {
   transform: rotate(90deg);
   font-size: 0px !important;
 }
-.horizontal {
+.vertical_up {
+  transform: rotate(-90deg);
+  font-size: 0px !important;
+}
+.horizontal_right {
+  font-size: 25px !important;
+}
+.horizontal_left {
   font-size: 25px !important;
 }

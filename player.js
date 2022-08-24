@@ -85,6 +85,24 @@ class Player {
     }
   }
 
+  #isColliding(cellIndex, activeShip) {
+    //console.log(activeShip.cells);
+    // startingPoint for extrapolation
+    const startingPoint = activeShip.cells[activeShip.cells.length - 1];
+
+    for (let i = activeShip.cells.length - 2; i >= 0; i--) {
+      //console.log(i);
+      if (activeShip.isVertical) {
+        if (this.isVerticalUp) {
+          console.log(cellIndex - 10);
+        }
+      }
+    }
+    // console.log("cells to verify:", activeShip.cells);
+    // console.log(activeShip, cellIndex);
+    return false;
+  }
+
   placeShip(cellIndex) {
     const cells = this.ships.getShipCells()[this.shipNumber];
     const activeShip = this.ships.ships[this.shipNumber];
@@ -96,7 +114,10 @@ class Player {
       // if both isvertical and ishorizontal is false , then it's the second placement and we
       // need to decide an placement direction
       if (!activeShip.isVertical && !activeShip.isHorizontal) {
-        if (this.isVerticalAdjacent(cellIndex, cells) && activeShip.isHorizontal === false) {
+        if (
+          this.isVerticalUp(cellIndex, cells) ||
+          (this.isVerticalDown(cellIndex, cells) && activeShip.isHorizontal === false)
+        ) {
           activeShip.isVertical = true;
         } else if (this.isHorizontalAdjacent(cellIndex, cells) && activeShip.isVertical === false) {
           activeShip.isHorizontal = true;
@@ -109,7 +130,10 @@ class Player {
         // this is the third cell or more placed.
         // Make sure the new clicked cell is vertical if this.ships.isVertical
         // or make sure the new clicked cell is horizontal if this.ships.isHorizontal
-        if (activeShip.isVertical && this.isVerticalAdjacent(cellIndex, cells)) {
+        if (
+          (activeShip.isVertical && this.isVerticalUp(cellIndex, cells)) ||
+          this.isVerticalDown(cellIndex, cells)
+        ) {
           console.log("valid vertical placement");
         } else if (activeShip.isHorizontal && this.isHorizontalAdjacent(cellIndex, cells)) {
           console.log("valid horizontal placement");
@@ -118,6 +142,14 @@ class Player {
           // not a valid placement
           return;
         }
+      }
+
+      // Gaurd logic that verifies this placement won't cross another ships placement
+      // uses isVertical and isHorizontal for direction
+      if (this.#isColliding(cellIndex, activeShip)) {
+        console.log("collision detected, aborting..");
+
+        return;
       }
     }
 
@@ -148,11 +180,10 @@ class Player {
     this.shipCells--;
   }
 
-  isVerticalAdjacent(cellIndex, cells) {
+  isVerticalUp(cellIndex, cells) {
     const adjacentUpCell = parseInt(cells[this.shipCells + 1]) - 10;
-    const adjacentDownCell = parseInt(cells[this.shipCells + 1]) + 10;
 
-    if (parseInt(cellIndex) === adjacentUpCell || parseInt(cellIndex) === adjacentDownCell) {
+    if (parseInt(cellIndex) === adjacentUpCell) {
       console.log("vertical placement detected");
       return true;
     } else {
@@ -160,6 +191,17 @@ class Player {
       return false;
     }
   }
+  isVerticalDown(cellIndex, cells) {
+    const adjacentDownCell = parseInt(cells[this.shipCells + 1]) + 10;
+    if (parseInt(cellIndex) === adjacentDownCell) {
+      console.log("vertical placement detected");
+      return true;
+    } else {
+      console.log("horizontal placement detected");
+      return false;
+    }
+  }
+
   isHorizontalAdjacent(cellIndex, cells) {
     const adjacentLeftCell = parseInt(cells[this.shipCells + 1]) - 1;
     const adjacentRightCell = parseInt(cells[this.shipCells + 1]) + 1;
