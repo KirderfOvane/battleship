@@ -74,6 +74,10 @@ class Grid {
     const cellIndex = event.target.getAttribute("cellIndex");
 
     if (game?.phase === "shipPlacement") {
+      //Gaurd: If already marked, do nothing
+      const marking = game?.currentPlayer.getMarking(cellIndex);
+      if (marking) return;
+
       game?.currentPlayer.placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {

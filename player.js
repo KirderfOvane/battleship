@@ -6,7 +6,7 @@ class Player {
     this.ships = ships;
     this.shipNumber = 0;
     this.shipCells = ships.getShipCells()[this.shipNumber].length - 1;
-    this.markings = new Array(100);
+    this.markings = {};
   }
 
   resetMarkers() {
@@ -17,7 +17,12 @@ class Player {
       this.grid.gridElement.children[this.playerId].children[i].style.backgroundImage = "unset";
     }
   }
-
+  getMarking(index) {
+    return this.markings[index.toString()];
+  }
+  setMarking(index, value) {
+    this.markings[index.toString()] = value;
+  }
   resetShip() {
     this.shipNumber = 0;
     this.shipCells = this.ships.getShipCells()[this.shipNumber].length - 1;
@@ -42,6 +47,7 @@ class Player {
   }
 
   placeShipMarker(cellIndex, type, shipCell) {
+    console.log("placeShipmarker: ", cellIndex, type, shipCell);
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
@@ -50,7 +56,6 @@ class Player {
     let imageRotation;
     if (game?.phase === "shipPlacement") {
       imageRotation = this.ships.ships[type].direction;
-      console.log("imagerotation:", imageRotation);
 
       imageNumber === 2 &&
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
@@ -66,7 +71,7 @@ class Player {
 
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
 
-    this.markings[cellIndex] = type;
+    this.setMarking(cellIndex, "x");
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute(
       "class",
       `shipPlacement ${imageRotation}`
@@ -83,8 +88,6 @@ class Player {
   }
 
   #extrapolate(gridValue, direction) {
-    //  console.log(gridValue, direction);
-
     let extrapolatedNumber;
     switch (direction) {
       case "up":
@@ -100,10 +103,10 @@ class Player {
         extrapolatedNumber = gridValue + 1;
         break;
       case "":
-        console.log("ERROR");
+        console.log("ERROR in EXTRAPOLATION");
         break;
     }
-    console.log(extrapolatedNumber, direction);
+    // console.log(extrapolatedNumber, direction);
 
     if (extrapolatedNumber > 99) return false;
     if (extrapolatedNumber < 0) return false;
@@ -205,7 +208,7 @@ class Player {
 
       // Now when we know direction we can calculate positions of the ship based on it's cell-length
       const calculation = this.#calculatePositions(cellIndex, activeShip);
-      console.log(calculation);
+
       if (calculation) {
         // console.log(calculation, this.shipCells, this.shipNumber);
         calculation.map((pos) => {
