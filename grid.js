@@ -60,7 +60,6 @@ class Grid {
       gridXranges.push(i);
     }
 
-    console.log(gridXranges);
     return gridXranges;
   }
 

@@ -29,9 +29,6 @@ class Player {
   placeMissMarker(cellIndex) {
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `miss`);
   }
-  isRotationChanged(imageRotation, imageNumber) {
-    return imageRotation === "vertical" && imageNumber === 2;
-  }
 
   adjustFirstShipCellRotation(ship, type, shipCellLength) {
     console.log("ADJUSTFIRSTSHIPCELLROTATION: ", ship, type, shipCellLength);
@@ -53,18 +50,18 @@ class Player {
     let imageRotation;
     if (game?.phase === "shipPlacement") {
       imageRotation = this.ships.ships[type].direction;
-      // console.log("imagerotation:", imageRotation);
-      this.isRotationChanged(imageRotation, imageNumber) &&
+      console.log("imagerotation:", imageRotation);
+
+      imageNumber === 2 &&
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
       // phase is gameplay,so should lookup enemy ships position.
       const opponent = this.name === "player1" ? "player2" : "player1";
       const opponentShip = game[opponent].ships.ships[type];
 
-      imageRotation = opponentShip.isVertical ? "vertical" : "horizontal";
+      imageRotation = opponentShip.direction;
 
-      this.isRotationChanged(imageRotation, imageNumber) &&
-        this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
+      imageNumber === 2 && this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
     }
 
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
@@ -106,6 +103,7 @@ class Player {
         console.log("ERROR");
         break;
     }
+    console.log(extrapolatedNumber, direction);
 
     if (extrapolatedNumber > 99) return false;
     if (extrapolatedNumber < 0) return false;
@@ -120,16 +118,19 @@ class Player {
         return true;
       }
     });
+    console.log("found no collision");
     return false;
   }
 
   #calculatePositions(cellIndex, activeShip) {
+    // check cellindex collisions before looping
+    if (this.#isColliding(cellIndex)) return false;
+
     let extrapolatedGridPoint = null;
     let collision = false;
     let positions = [];
 
-    // check cellindex collisions before looping
-    if (this.#isColliding(cellIndex)) return false;
+    // add cellIndex(click 2) cell to positions
     positions.push(cellIndex);
 
     for (let i = activeShip.cells.length - 3; i >= 0; i--) {
@@ -147,30 +148,39 @@ class Player {
         return;
       }
       // Gaurd collision-check
-      collision = this.#isColliding(extrapolatedGridPoint);
+      if (this.#isColliding(extrapolatedGridPoint)) {
+        collision = true;
+        return;
+      }
       positions.push(extrapolatedGridPoint);
     }
-    // console.log(activeShip.cells[activeShip.cells.length - 1]);
-    // Gaurd out of x bounds check
-    const res = this.#isOutOfXbounds(activeShip.cells[activeShip.cells.length - 1], positions);
-    if (res) collision = true;
+    // Gaurd: If collision is detected inside the loop, don't do bound-check, just abort.
+    if (collision) return false;
 
-    return collision ? false : positions;
+    // Gaurd out of x bounds check
+    if (activeShip.direction === "left" || activeShip.direction === "right") {
+      const resultOfCheck = this.#isOutOfXbounds(
+        activeShip.cells[activeShip.cells.length - 1],
+        positions
+      );
+      if (resultOfCheck) collision = true;
+    }
+
+    return collision === false ? positions : false;
   }
 
   #isOutOfXbounds(shipCellOne, restOfShipCells) {
     let isOutOfXbounds = false;
     const xRanges = this.grid.getXgridBounds();
-    //console.log(xRanges);
-    // console.log(xRanges.filter((range) => range < 11));
+
     for (let i = 1; i < xRanges.length; i++) {
-      console.log(xRanges[i], shipCellOne, xRanges[i] > shipCellOne);
+      // console.log(xRanges[i], shipCellOne, xRanges[i] > shipCellOne);
       if (xRanges[i] > parseInt(shipCellOne)) {
-        console.log("FOUND range", xRanges[i - 1] + "-", xRanges[i]);
+        // console.log("FOUND range", xRanges[i - 1] + "-", xRanges[i]);
         const test = restOfShipCells.filter((v) => v >= xRanges[i - 1] && v < xRanges[i]);
-        console.log(test.length, restOfShipCells.length);
+
         if (test.length !== restOfShipCells.length) {
-          console.log("oh shit, out of bounds!", restOfShipCells.length - test.length);
+          console.log("Out of x-bounds!", restOfShipCells.length - test.length);
           isOutOfXbounds = true;
         }
         return isOutOfXbounds;
@@ -179,9 +189,6 @@ class Player {
       }
     }
     return isOutOfXbounds;
-    //console.log(shipCellOne);
-    restOfShipCells.splice(0, 0, shipCellOne);
-    //console.log(restOfShipCells);
   }
 
   placeShip(cellIndex) {
@@ -192,19 +199,18 @@ class Player {
     // cellIndex in one ship the direction of the ship is also decided and all other indexes in
     // the other direction should be scrapped.
     if (this.isNotFirstCell()) {
-      // if direction is empty , then it's the second placement and we
-      // need to decide an placement direction
-      if (activeShip.direction === "") {
-        this.#setDirection(activeShip, cellIndex, cells);
-      }
+      //  It's the second placement/click and we
+      // can  decide an placement direction
+      this.#setDirection(activeShip, cellIndex, cells);
+
       // Now when we know direction we can calculate positions of the ship based on it's cell-length
       const calculation = this.#calculatePositions(cellIndex, activeShip);
       console.log(calculation);
       if (calculation) {
         // console.log(calculation, this.shipCells, this.shipNumber);
         calculation.map((pos) => {
-          this.ships.setShipCell(this.shipNumber, this.shipCells, pos);
-          this.placeShipMarker(pos, this.shipNumber, this.shipCells);
+          this.ships.setShipCell(this.shipNumber, this.shipCells, pos.toString());
+          this.placeShipMarker(pos.toString(), this.shipNumber, this.shipCells);
           if (this.shipCells === 0) {
             this.shipNumber++;
             if (this.shipNumber === 5) {
