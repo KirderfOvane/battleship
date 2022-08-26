@@ -255,14 +255,22 @@ class Player {
       this.#clearPossibilityMarkers();
       this.#clearPossibilities();
     } else {
+      // this need to be set so we can find possible placements
       this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
+
+      this.#findAndDrawAllPossiblePlacements(cellIndex, activeShip);
+      if (this.possibilities.length === 0) {
+        console.log("there are no possibility to place this type of ship here!");
+        // we need to remove the click from shipcells
+        this.ships.removeShipCell(this.shipNumber, this.shipCells, cellIndex);
+        return;
+      }
       this.placeShipMarker(cellIndex, this.shipNumber, this.shipCells);
-      this.#findAllPossiblePlacements(cellIndex, activeShip);
       this.shipCells--;
     }
   }
 
-  #findAllPossiblePlacements(cellIndex, activeShip) {
+  #findAndDrawAllPossiblePlacements(cellIndex, activeShip) {
     const upDir = this.#calculatePositions(cellIndex, activeShip, "up");
     const downDir = this.#calculatePositions(cellIndex, activeShip, "down");
     const leftDir = this.#calculatePositions(cellIndex, activeShip, "left");
@@ -283,6 +291,8 @@ class Player {
       this.possibilities.push(rightDir);
       this.#placePossibilityMarker(rightDir[1]);
     }
+
+    console.log(this.possibilities);
   }
   #clearPossibilities() {
     this.possibilities = [];
