@@ -30,9 +30,11 @@ class Player {
   }
 
   placeHitMarker(cellIndex) {
+    this.setMarking(cellIndex, "hit");
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `hit`);
   }
   placeMissMarker(cellIndex) {
+    this.setMarking(cellIndex, "miss");
     this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute("class", `miss`);
   }
 

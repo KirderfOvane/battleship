@@ -73,11 +73,11 @@ class Grid {
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
 
-    if (game?.phase === "shipPlacement") {
-      //Gaurd: If already marked, do nothing
-      const marking = game?.currentPlayer.getMarking(cellIndex);
-      if (marking) return;
+    //Gaurd: If already marked, do nothing
+    const marking = game?.currentPlayer.getMarking(cellIndex);
+    if (marking) return;
 
+    if (game?.phase === "shipPlacement") {
       // Gaurd: If possibilityMarkings exists, only accept those possibilities as cellIndex
       const possibilityMarkings = game?.currentPlayer.possibilityMarkings;
       if (possibilityMarkings.length > 0 && !possibilityMarkings.includes(cellIndex)) return;
