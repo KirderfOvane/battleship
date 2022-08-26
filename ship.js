@@ -5,40 +5,35 @@ class Ships {
       type: "carrier",
       cells: ["-1", "-1", "-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.battleship = {
       type: "battleship",
       cells: ["-1", "-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.cruiser = {
       type: "cruiser",
       cells: ["-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.submarine = {
       type: "submarine",
       cells: ["-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.destroyer = {
       type: "destroyer",
       cells: ["-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
@@ -48,40 +43,35 @@ class Ships {
       type: "carrier",
       cells: ["-1", "-1", "-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.battleship = {
       type: "battleship",
       cells: ["-1", "-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.cruiser = {
       type: "cruiser",
       cells: ["-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.submarine = {
       type: "submarine",
       cells: ["-1", "-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.destroyer = {
       type: "destroyer",
       cells: ["-1", "-1"],
       hits: [],
-      isVertical: false,
-      isHorizontal: false,
+
       direction: "",
     };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
@@ -90,7 +80,6 @@ class Ships {
     return this.ships.map((ship) => ship.cells);
   }
   setShipCell(shipNumber, cell, newValue) {
-    console.log(this.ships[shipNumber].cells[cell], cell, newValue);
     this.ships[shipNumber].cells[cell] = newValue;
   }
   shot(cellIndex) {

@@ -7,11 +7,12 @@ class Player {
     this.shipNumber = 0;
     this.shipCells = ships.getShipCells()[this.shipNumber].length - 1;
     this.markings = {};
+    this.possibilityMarkings = [];
+    this.possibilities = [];
   }
 
   resetMarkers() {
-    console.log("resetting markers");
-    this.markings = new Array(100);
+    this.markings = {};
     for (let i = 0; i < 100; i++) {
       this.grid.gridElement.children[this.playerId].children[i].setAttribute("class", "empty");
       this.grid.gridElement.children[this.playerId].children[i].style.backgroundImage = "unset";
@@ -36,7 +37,6 @@ class Player {
   }
 
   adjustFirstShipCellRotation(ship, type, shipCellLength) {
-    console.log("ADJUSTFIRSTSHIPCELLROTATION: ", ship, type, shipCellLength);
     // imageRotation is decided on the second placement
     // So index 0 is always rotated horizontal ,so if index 1 is decided vertical we need to go back
     // and change index 0 to be rotated vertical
@@ -47,7 +47,6 @@ class Player {
   }
 
   placeShipMarker(cellIndex, type, shipCell) {
-    console.log("placeShipmarker: ", cellIndex, type, shipCell);
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
@@ -56,7 +55,6 @@ class Player {
     let imageRotation;
     if (game?.phase === "shipPlacement") {
       imageRotation = this.ships.ships[type].direction;
-
       imageNumber === 2 &&
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
@@ -106,66 +104,74 @@ class Player {
         console.log("ERROR in EXTRAPOLATION");
         break;
     }
-    // console.log(extrapolatedNumber, direction);
 
     if (extrapolatedNumber > 99) return false;
     if (extrapolatedNumber < 0) return false;
-    return extrapolatedNumber;
+    return extrapolatedNumber.toString();
   }
 
   #isColliding(gridPoint) {
-    this.ships.getShipCells().map((shipCells) => {
-      if (shipCells.includes(gridPoint)) {
-        console.log("FOUND COLLISION");
+    let collision = false;
+    const ShipCells = this.ships.getShipCells();
 
-        return true;
+    for (let i = 0; i < ShipCells.length; i++) {
+      if (ShipCells[i].includes(gridPoint.toString())) {
+        collision = true;
+        break;
       }
-    });
-    console.log("found no collision");
-    return false;
+    }
+
+    return collision;
   }
 
-  #calculatePositions(cellIndex, activeShip) {
+  #calculatePositions(cellIndex, activeShip, direction = activeShip.direction) {
     // check cellindex collisions before looping
-    if (this.#isColliding(cellIndex)) return false;
+    if (this.#isColliding(cellIndex.toString()) && this.isNotFirstCell()) return false;
 
     let extrapolatedGridPoint = null;
     let collision = false;
     let positions = [];
+    let numCells = activeShip.cells.length - 1;
 
     // add cellIndex(click 2) cell to positions
-    positions.push(cellIndex);
+    positions.push(cellIndex.toString());
 
-    for (let i = activeShip.cells.length - 3; i >= 0; i--) {
+    // special-case for destroyer
+    if (0 > numCells) {
+      numCells = 0;
+    }
+
+    for (let i = numCells; i > 0; i--) {
       if (!extrapolatedGridPoint) {
-        extrapolatedGridPoint = this.#extrapolate(parseInt(cellIndex), activeShip.direction);
+        extrapolatedGridPoint = this.#extrapolate(parseInt(cellIndex), direction);
       } else {
-        extrapolatedGridPoint = this.#extrapolate(
-          parseInt(extrapolatedGridPoint),
-          activeShip.direction
-        );
+        extrapolatedGridPoint = this.#extrapolate(parseInt(extrapolatedGridPoint), direction);
       }
+      // Beware: it is checking for false, but integer 0 also interprets as false.
+      // So if extrapolatedGridPoint is not converted to string before it will take 0 as false.
       if (extrapolatedGridPoint === false) {
-        console.log("FOUND OUT OF GRID-BOUNDS");
+        console.log("FOUND OUT OF GRID-BOUNDS", direction);
         collision = true;
         return;
       }
       // Gaurd collision-check
-      if (this.#isColliding(extrapolatedGridPoint)) {
+      if (this.#isColliding(extrapolatedGridPoint.toString())) {
         collision = true;
         return;
       }
+
       positions.push(extrapolatedGridPoint);
     }
     // Gaurd: If collision is detected inside the loop, don't do bound-check, just abort.
     if (collision) return false;
 
     // Gaurd out of x bounds check
-    if (activeShip.direction === "left" || activeShip.direction === "right") {
+    if (direction === "left" || direction === "right") {
       const resultOfCheck = this.#isOutOfXbounds(
         activeShip.cells[activeShip.cells.length - 1],
         positions
       );
+
       if (resultOfCheck) collision = true;
     }
 
@@ -177,9 +183,7 @@ class Player {
     const xRanges = this.grid.getXgridBounds();
 
     for (let i = 1; i < xRanges.length; i++) {
-      // console.log(xRanges[i], shipCellOne, xRanges[i] > shipCellOne);
       if (xRanges[i] > parseInt(shipCellOne)) {
-        // console.log("FOUND range", xRanges[i - 1] + "-", xRanges[i]);
         const test = restOfShipCells.filter((v) => v >= xRanges[i - 1] && v < xRanges[i]);
 
         if (test.length !== restOfShipCells.length) {
@@ -191,6 +195,7 @@ class Player {
         continue;
       }
     }
+
     return isOutOfXbounds;
   }
 
@@ -206,65 +211,101 @@ class Player {
       // can  decide an placement direction
       this.#setDirection(activeShip, cellIndex, cells);
 
-      // Now when we know direction we can calculate positions of the ship based on it's cell-length
-      const calculation = this.#calculatePositions(cellIndex, activeShip);
+      this.possibilityMarkings.forEach((mark) => {
+        if (mark === cellIndex) {
+          // removing from possibilitymarkers as clearpossibilityMarker-method will later
+          // otherwise override the image with class empty instead
+          this.#removePossibilityMarker(cellIndex);
 
-      if (calculation) {
-        // console.log(calculation, this.shipCells, this.shipNumber);
-        calculation.map((pos) => {
-          this.ships.setShipCell(this.shipNumber, this.shipCells, pos.toString());
-          this.placeShipMarker(pos.toString(), this.shipNumber, this.shipCells);
-          if (this.shipCells === 0) {
-            this.shipNumber++;
-            if (this.shipNumber === 5) {
-              if (this.name === "player2") {
-                // shipPlacement is complete
+          this.possibilities.map((dir) => {
+            if (dir[1] === cellIndex) {
+              dir.map((cell, index) => {
+                if (index !== 0) {
+                  this.ships.setShipCell(this.shipNumber, this.shipCells, cell.toString());
+                  this.placeShipMarker(cell.toString(), this.shipNumber, this.shipCells);
 
-                statusText.textContent = `Ship placement complete!`;
-                game?.newPhase("shipPlacement_completed");
-                return;
-              } else {
-                // first player is finished placing ships
-                game?.changePlayer();
-                return;
-              }
+                  if (this.shipCells === 0) {
+                    this.shipNumber++;
+                    if (this.shipNumber === 5) {
+                      if (this.name === "player2") {
+                        // shipPlacement is complete
+
+                        statusText.textContent = `Ship placement complete!`;
+                        game?.newPhase("shipPlacement_completed");
+                        return;
+                      } else {
+                        // first player is finished placing ships
+                        game?.changePlayer();
+                        return;
+                      }
+                    }
+
+                    statusText.textContent = `${this.name}'s turn to place ${
+                      this.ships.ships[this.shipNumber].type
+                    }`;
+                    this.shipCells = this.ships.ships[this.shipNumber].cells.length;
+                  }
+                  this.shipCells--;
+                }
+              });
             }
-
-            statusText.textContent = `${this.name}'s turn to place ${
-              this.ships.ships[this.shipNumber].type
-            }`;
-            this.shipCells = this.ships.ships[this.shipNumber].cells.length;
-          }
-          this.shipCells--;
-        });
-      }
+          });
+        }
+      });
+      this.#clearPossibilityMarkers();
+      this.#clearPossibilities();
     } else {
       this.ships.setShipCell(this.shipNumber, this.shipCells, cellIndex);
       this.placeShipMarker(cellIndex, this.shipNumber, this.shipCells);
-
-      if (this.shipCells === 0) {
-        this.shipNumber++;
-        if (this.shipNumber === 5) {
-          if (this.name === "player2") {
-            // shipPlacement is complete
-
-            statusText.textContent = `Ship placement complete!`;
-            game?.newPhase("shipPlacement_completed");
-            return;
-          } else {
-            // first player is finished placing ships
-            game?.changePlayer();
-            return;
-          }
-        }
-
-        statusText.textContent = `${this.name}'s turn to place ${
-          this.ships.ships[this.shipNumber].type
-        }`;
-        this.shipCells = this.ships.ships[this.shipNumber].cells.length;
-      }
+      this.#findAllPossiblePlacements(cellIndex, activeShip);
       this.shipCells--;
     }
+  }
+
+  #findAllPossiblePlacements(cellIndex, activeShip) {
+    const upDir = this.#calculatePositions(cellIndex, activeShip, "up");
+    const downDir = this.#calculatePositions(cellIndex, activeShip, "down");
+    const leftDir = this.#calculatePositions(cellIndex, activeShip, "left");
+    const rightDir = this.#calculatePositions(cellIndex, activeShip, "right");
+    if (upDir) {
+      this.possibilities.push(upDir);
+      this.#placePossibilityMarker(upDir[1]);
+    }
+    if (downDir) {
+      this.possibilities.push(downDir);
+      this.#placePossibilityMarker(downDir[1]);
+    }
+    if (leftDir) {
+      this.possibilities.push(leftDir);
+      this.#placePossibilityMarker(leftDir[1]);
+    }
+    if (rightDir) {
+      this.possibilities.push(rightDir);
+      this.#placePossibilityMarker(rightDir[1]);
+    }
+  }
+  #clearPossibilities() {
+    this.possibilities = [];
+  }
+
+  #placePossibilityMarker(cellNum) {
+    this.possibilityMarkings.push(cellNum);
+    this.grid.gridElement.children[this.playerId].children[cellNum].setAttribute(
+      "class",
+      `possibilites`
+    );
+  }
+  #removePossibilityMarker(cellIndex) {
+    this.possibilityMarkings = this.possibilityMarkings.filter((index) => index !== cellIndex);
+  }
+  #clearPossibilityMarkers() {
+    this.possibilityMarkings.forEach((cellIndex) => {
+      this.grid.gridElement.children[this.playerId].children[cellIndex.toString()].setAttribute(
+        "class",
+        "empty"
+      );
+    });
+    this.possibilityMarkings = [];
   }
 
   #setDirection(activeShip, cellIndex, cells) {

@@ -78,13 +78,17 @@ class Grid {
       const marking = game?.currentPlayer.getMarking(cellIndex);
       if (marking) return;
 
+      // Gaurd: If possibilityMarkings exists, only accept those possibilities as cellIndex
+      const possibilityMarkings = game?.currentPlayer.possibilityMarkings;
+      if (possibilityMarkings.length > 0 && !possibilityMarkings.includes(cellIndex)) return;
+
       game?.currentPlayer.placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {
       // check that it's not next users turn
       if (!this.lastPlayerClicked || this.lastPlayerClicked !== game?.currentPlayer.name) {
         // no action if cellindex is already marked
-        if (game?.currentPlayer.markings[cellIndex]) {
+        if (game?.currentPlayer.getMarking(cellIndex)) {
           return;
         }
         // set lastplayerclicked-state to be able to keep track of who's turn it is.
