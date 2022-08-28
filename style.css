@@ -6,8 +6,8 @@ body {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(10, 50px);
-  width: 500px;
+  /*  grid-template-columns: repeat(11, 50px); */
+  /* width: 550px; */
   border: 1px solid black;
   margin: auto;
   background-color: white;
@@ -20,6 +20,25 @@ body {
   width: 50px;
   height: 50px;
   border: 1px solid gray;
+  cursor: pointer;
+  font-size: 18px;
+  text-align: center;
+  margin: auto;
+}
+
+#notationx {
+  width: 50px;
+  height: 50px;
+  background-color: lightcoral;
+  cursor: pointer;
+  font-size: 18px;
+  text-align: center;
+  margin: auto;
+}
+#notationy {
+  width: 50px;
+  height: 50px;
+  background-color: lightblue;
   cursor: pointer;
   font-size: 18px;
   text-align: center;

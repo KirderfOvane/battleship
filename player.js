@@ -72,12 +72,21 @@ class Player {
     const urlString = `url(/images/${shipTypeName}_0${imageNumber}.png)`;
 
     this.setMarking(cellIndex, "x");
-    this.grid.gridElement.children[this.playerId].children[cellIndex].setAttribute(
-      "class",
-      `shipPlacement ${imageRotation}`
-    );
-    this.grid.gridElement.children[this.playerId].children[cellIndex].style.backgroundImage =
-      urlString;
+    const gameGridCells = this.getGameGridCells();
+
+    gameGridCells[cellIndex].setAttribute("class", `shipPlacement ${imageRotation}`);
+    gameGridCells[cellIndex].style.backgroundImage = urlString;
+  }
+
+  getGameGridCells() {
+    const allGridCells = this.grid.gridElement.children[this.playerId];
+    const gameGridCells = [];
+    for (let i = 0; i < allGridCells.children.length; i++) {
+      if (allGridCells.children[i].getAttribute("cellIndex")) {
+        gameGridCells.push(allGridCells.children[i]);
+      }
+    }
+    return gameGridCells;
   }
 
   displayShipSankedMarker(shipIndexes, shipNum) {
@@ -293,8 +302,6 @@ class Player {
       this.possibilities.push(rightDir);
       this.#placePossibilityMarker(rightDir[1]);
     }
-
-    console.log(this.possibilities);
   }
   #clearPossibilities() {
     this.possibilities = [];
@@ -302,20 +309,15 @@ class Player {
 
   #placePossibilityMarker(cellNum) {
     this.possibilityMarkings.push(cellNum);
-    this.grid.gridElement.children[this.playerId].children[cellNum].setAttribute(
-      "class",
-      `possibilites`
-    );
+    this.getGameGridCells()[cellNum].setAttribute("class", `possibilites`);
   }
   #removePossibilityMarker(cellIndex) {
     this.possibilityMarkings = this.possibilityMarkings.filter((index) => index !== cellIndex);
   }
   #clearPossibilityMarkers() {
+    const gameGridCells = this.getGameGridCells();
     this.possibilityMarkings.forEach((cellIndex) => {
-      this.grid.gridElement.children[this.playerId].children[cellIndex.toString()].setAttribute(
-        "class",
-        "empty"
-      );
+      gameGridCells[cellIndex.toString()].setAttribute("class", "empty");
     });
     this.possibilityMarkings = [];
   }

@@ -80,7 +80,6 @@ class Ships {
     return this.ships.map((ship) => ship.cells);
   }
   setShipCell(shipNumber, cell, newValue) {
-    console.log(newValue);
     this.ships[shipNumber].cells[cell] = newValue;
   }
   removeShipCell(shipNumber, cell) {

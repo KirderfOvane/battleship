@@ -1,17 +1,33 @@
 class Grid {
-  constructor(gridSize, cellSize, gridElement, name) {
+  constructor(gridSize, cellSize, gridElement, name, gridNotation = false) {
     this.name = name;
     this.gridSize = gridSize;
     this.cellSize = cellSize;
     this.gridElement = gridElement;
     this.lastPlayerClicked = undefined;
+    this.gridNotation = gridNotation;
   }
   draw(gridElement) {
     let gridParent;
+
     if (gridElement.children.length < 2) {
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
       gridParent.setAttribute("class", "grid");
+      if (this.gridNotation) {
+        const newGridSize = this.gridSize[0] + this.cellSize;
+        gridParent.style.width = newGridSize.toString() + "px";
+
+        gridParent.style.gridTemplateColumns = `repeat(${
+          this.gridSize[0] / this.cellSize[0] + 1
+        }, ${this.cellSize[0].toString() + "px"})`;
+      } else {
+        gridParent.style.width = this.gridSize[0].toString() + "px";
+        gridParent.style.gridTemplateColumns = `repeat(${this.gridSize[0] / this.cellSize[0]}, ${
+          this.cellSize[0].toString() + "px"
+        })`;
+      }
+
       gridElement.appendChild(gridParent);
       if (this.name === "player2-grid") {
         gridElement.children[1].style.display = "grid";
@@ -30,21 +46,43 @@ class Grid {
     }
     let node;
     let textnode;
-    let index = 0;
+    let gameCellindex = 0;
 
-    const numOfRows = gridSize[0] / cellSize[0];
-    const numOfColumns = gridSize[1] / cellSize[1];
+    let numOfRows = gridSize[0] / cellSize[0];
+    let numOfColumns = gridSize[1] / cellSize[1];
 
-    for (let i = 0; i < numOfRows; i++) {
-      for (let j = 0; j < numOfColumns; j++) {
+    if (this.gridNotation) {
+      numOfRows++;
+      numOfColumns++;
+    }
+
+    for (let y = 0; y < numOfRows; y++) {
+      for (let x = 0; x < numOfColumns; x++) {
         node = document.createElement("div");
-        node.setAttribute("id", "cell");
-        node.setAttribute("cellIndex", index);
-        node.addEventListener("click", Grid.cellClicked);
-        textnode = document.createTextNode(index);
-        node.appendChild(textnode);
+        if (x === 0 && y === 0) {
+          node.setAttribute("class", "empty");
+        } else {
+          if (this.gridNotation && y === 0 && x !== 0) {
+            node.setAttribute("id", "notationx");
+
+            textnode = document.createTextNode(this.gridNotation[0][x - 1]);
+            node.appendChild(textnode);
+          } else if (this.gridNotation && y !== 0 && x === 0) {
+            node.setAttribute("id", "notationy");
+            textnode = document.createTextNode(this.gridNotation[1][y - 1]);
+            node.appendChild(textnode);
+          } else {
+            node.setAttribute("id", "cell");
+            node.setAttribute("cellIndex", gameCellindex);
+            node.addEventListener("click", Grid.cellClicked);
+
+            textnode = document.createTextNode(gameCellindex);
+            node.appendChild(textnode);
+            gameCellindex++;
+          }
+        }
+
         gridParent.appendChild(node);
-        index++;
       }
     }
   }
@@ -72,7 +110,7 @@ class Grid {
 
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
-
+    console.log(cellIndex);
     //Gaurd: If already marked, do nothing
     const marking = game?.currentPlayer.getMarking(cellIndex);
     if (marking) return;
