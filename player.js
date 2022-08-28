@@ -13,10 +13,16 @@ class Player {
 
   resetMarkers() {
     this.markings = {};
-    for (let i = 0; i < 100; i++) {
-      this.grid.gridElement.children[this.playerId].children[i].setAttribute("class", "empty");
-      this.grid.gridElement.children[this.playerId].children[i].style.backgroundImage = "unset";
+    const gameGridCells = this.getGameGridCells();
+
+    for (let i = 0; i < gameGridCells.length; i++) {
+      gameGridCells[i].setAttribute("class", "empty");
+      gameGridCells[i].style.backgroundImage = "unset";
     }
+  }
+  resetShip() {
+    this.shipNumber = 0;
+    this.shipCells = this.ships.getShipCells()[this.shipNumber].length - 1;
   }
   getMarking(index) {
     return this.markings[index.toString()];
@@ -24,14 +30,9 @@ class Player {
   setMarking(index, value) {
     this.markings[index.toString()] = value;
   }
-  resetShip() {
-    this.shipNumber = 0;
-    this.shipCells = this.ships.getShipCells()[this.shipNumber].length - 1;
-  }
 
   placeHitMarker(cellIndex) {
     this.setMarking(cellIndex, "hit");
-
     this.getGameGridCells()[cellIndex].setAttribute("class", `hit`);
   }
   placeMissMarker(cellIndex) {
