@@ -6,11 +6,6 @@ body {
 
 .grid {
   display: grid;
-  /*  grid-template-columns: repeat(11, 50px); */
-  /* width: 550px; */
-  border: 1px solid black;
-  margin: auto;
-  background-color: white;
 }
 .hiddenGrid {
   display: "none";
@@ -24,32 +19,38 @@ body {
   font-size: 18px;
   text-align: center;
   margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
 }
 
 #notationx {
   width: 50px;
   height: 50px;
-  background-color: lightcoral;
-  cursor: pointer;
   font-size: 18px;
   text-align: center;
   margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #notationy {
   width: 50px;
   height: 50px;
-  background-color: lightblue;
-  cursor: pointer;
   font-size: 18px;
   text-align: center;
   margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hit {
-  background-color: red;
+  background-color: red !important;
 }
 .miss {
-  background-color: gray;
+  background-color: gray !important;
 }
 .shipPlacement {
   background-color: green;
@@ -63,11 +64,9 @@ body {
 
 #player1-grid {
   display: grid;
-  background-color: aquamarine;
 }
 #player2-grid {
   display: grid;
-  background-color: coral;
 }
 
 #interactionBtn {
@@ -77,7 +76,7 @@ body {
 }
 
 .sanked {
-  background-color: black;
+  basckground-color: black;
 }
 .startimage {
   background-position: center;
@@ -91,20 +90,27 @@ body {
   background-color: cornflowerblue;
 }
 .down {
+  width: 50px;
+  height: 50px;
   transform: rotate(90deg);
   font-size: 0px !important;
 }
 .up {
+  width: 50px;
+  height: 50px;
   transform: rotate(-90deg);
   font-size: 0px !important;
 }
 .right {
+  width: 50px;
+  height: 50px;
   font-size: 0px !important;
 }
 .left {
+  width: 50px;
+  height: 50px;
   transform: rotate(180deg);
   font-size: 0px !important;
-  bosrder: 3px solid red !important;
 }
 .possibilites {
   background-color: cadetblue !important;

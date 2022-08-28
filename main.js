@@ -14,7 +14,7 @@ class initializeGame {
     this.phase = "init";
     this.grid1 = new Grid(gridSize, cellSize, grid, "player1-grid", gridNotation);
     this.player1 = new Player("player1", new Ships("player1"), this.grid1, 0);
-    this.grid2 = new Grid(gridSize, cellSize, grid, "player2-grid");
+    this.grid2 = new Grid(gridSize, cellSize, grid, "player2-grid", gridNotation);
     this.player2 = new Player("player2", new Ships("player2"), this.grid2, 1);
     this.currentPlayer = this.player1;
     this.button = button;

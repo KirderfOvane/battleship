@@ -21,6 +21,8 @@ class Grid {
         gridParent.style.gridTemplateColumns = `repeat(${
           this.gridSize[0] / this.cellSize[0] + 1
         }, ${this.cellSize[0].toString() + "px"})`;
+        gridParent.style.justifyContent = "center";
+        gridParent.style.alignContent = "center";
       } else {
         gridParent.style.width = this.gridSize[0].toString() + "px";
         gridParent.style.gridTemplateColumns = `repeat(${this.gridSize[0] / this.cellSize[0]}, ${
@@ -110,7 +112,7 @@ class Grid {
 
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
-    console.log(cellIndex);
+
     //Gaurd: If already marked, do nothing
     const marking = game?.currentPlayer.getMarking(cellIndex);
     if (marking) return;

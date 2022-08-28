@@ -5,35 +5,30 @@ class Ships {
       type: "carrier",
       cells: ["-1", "-1", "-1", "-1", "-1"],
       hits: [],
-
       direction: "",
     };
     this.battleship = {
       type: "battleship",
       cells: ["-1", "-1", "-1", "-1"],
       hits: [],
-
       direction: "",
     };
     this.cruiser = {
       type: "cruiser",
       cells: ["-1", "-1", "-1"],
       hits: [],
-
       direction: "",
     };
     this.submarine = {
       type: "submarine",
       cells: ["-1", "-1", "-1"],
       hits: [],
-
       direction: "",
     };
     this.destroyer = {
       type: "destroyer",
       cells: ["-1", "-1"],
       hits: [],
-
       direction: "",
     };
     this.ships = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer];
