@@ -48,6 +48,12 @@ findGame.addEventListener("click", (e) => {
   socket.emit("findGame", username);
 });
 
+// Listen for game match/start
+socket.on("match", (match) => {
+  console.log("starting match with players:", username, match.username);
+  window.location.href = "../game/game.html";
+});
+
 // Output message to DOM
 function outputMessage(message) {
   const div = document.createElement("div");

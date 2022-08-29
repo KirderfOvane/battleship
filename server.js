@@ -43,14 +43,31 @@ io.on("connection", (socket) => {
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);
-
     io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
 
   // Listen for findGame click
   socket.on("findGame", () => {
-    console.log(socket.id, "wants a game");
-    findGame(socket.id);
+    const currentUser = getCurrentUser(socket.id);
+    console.log(currentUser.username, "wants a game");
+    const playerMatch = findGame(socket.id);
+    if (playerMatch) {
+      console.log(playerMatch);
+      console.log("Starting Game between ", playerMatch.username, "and", currentUser.username);
+      io.to("lobby").emit(
+        "message",
+        formatMessage(
+          botName,
+          `Starting game between ${playerMatch.username} and ${currentUser.username}`
+        )
+      );
+      io.to("lobby").emit("match", playerMatch);
+    } else {
+      io.to("lobby").emit(
+        "message",
+        formatMessage(botName, `${currentUser.username} is looking for a game`)
+      );
+    }
   });
 
   // Runs when client disconnects

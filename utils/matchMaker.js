@@ -16,16 +16,37 @@ function findGame(userId) {
   const potentialGameOpponents = users.filter(
     (user) => user.id !== userId && gameQueue.filter((id) => id !== userId)
   );
-  if (potentialGameOpponents.length > 0) {
+  if (potentialGameOpponents.length > 0 && gameQueue.length > 0) {
     console.log("found potentialOpponents", potentialGameOpponents);
-    // matching with the player that has waited the longest:
-    const match = potentialGameOpponents.filter((u) => u.id === gameQueue[0] && u.id !== userId);
-    const you = getCurrentUser(userId);
-    console.log("MATCH:", match, "against you:", you.username);
-    console.log("STARTING GAME");
-    startGame(you, match);
+    console.log("queue", gameQueue);
+    let match = false;
+    for (let i = 0; i < gameQueue.length; i++) {
+      console.log(gameQueue[i], userId, potentialGameOpponents.includes(gameQueue[i]));
+      if (gameQueue[i] !== userId) {
+        for (let j = 0; j < potentialGameOpponents.length; j++) {
+          if (potentialGameOpponents[j].id === gameQueue[i]) {
+            console.log("found match");
+            console.log(gameQueue[i]);
+            match = gameQueue[i];
+          }
+        }
+      }
+    }
+
+    console.log("match", match);
+    if (match) {
+      console.log("entry");
+      removeUserFromGameQueue(userId);
+      removeUserFromGameQueue(match);
+      return getCurrentUser(match);
+    } else {
+      return match;
+    }
   } else {
     addUserToGameQueue(userId);
+    console.log("no users in queue, show waitingmode to user");
+    console.log("gameQueue:", gameQueue);
+    return false;
   }
 }
 
