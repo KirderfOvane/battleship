@@ -10,12 +10,12 @@ const gridNotation = [
 ];
 
 class initializeGame {
-  constructor(grid, button) {
+  constructor(grid, button, player1, player2) {
     this.phase = "init";
     this.grid1 = new Grid(gridSize, cellSize, grid, "player1-grid", gridNotation);
-    this.player1 = new Player("player1", new Ships("player1"), this.grid1, 0);
+    this.player1 = new Player(player1.username, new Ships("player1"), this.grid1, 0);
     this.grid2 = new Grid(gridSize, cellSize, grid, "player2-grid", gridNotation);
-    this.player2 = new Player("player2", new Ships("player2"), this.grid2, 1);
+    this.player2 = new Player(player2.username, new Ships("player2"), this.grid2, 1);
     this.currentPlayer = this.player1;
     this.button = button;
     if (this.phase === "init") this.startShipPlacement();
@@ -154,4 +154,4 @@ class initializeGame {
   }
 }
 
-const game = new initializeGame(grid, btn);
+const game = new initializeGame(grid, btn, players[0], players[1]);

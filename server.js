@@ -3,7 +3,13 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
-const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require("./utils/users");
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+  userChangeRoom,
+} = require("./utils/users");
 const { findGame } = require("./utils/matchMaker");
 
 const app = express();
@@ -31,12 +37,26 @@ io.on("connection", (socket) => {
     // Broadcast when a user connects
     socket.broadcast
       .to(user.room)
-      .emit("message", formatMessage(botName, `${user.username} has joined the chat`)); // all except the client that triggers
+      .emit("message", formatMessage(botName, `${user.username} has joined the ${user.room}`)); // all except the client that triggers
 
     // Send users and room info
     io.to(user.room).emit("roomUsers", {
       room: user.room,
       users: getRoomUsers(user.room),
+    });
+  });
+
+  socket.on("joinGame", ({ user, room }) => {
+    console.log("joinGame found:", user, room);
+    userLeave(user.id);
+    const newUser = userJoin(user.id, user.username, room);
+
+    socket.join(room);
+    // io.to("gameRoom").emit("startGame");
+    // Send users and room info to lobby
+    io.to("lobby").emit("roomUsers", {
+      room: "lobby",
+      users: getRoomUsers("lobby"),
     });
   });
 
@@ -49,19 +69,10 @@ io.on("connection", (socket) => {
   // Listen for findGame click
   socket.on("findGame", () => {
     const currentUser = getCurrentUser(socket.id);
-    console.log(currentUser.username, "wants a game");
+    console.log("currentUser", currentUser);
     const playerMatch = findGame(socket.id);
     if (playerMatch) {
-      console.log(playerMatch);
-      console.log("Starting Game between ", playerMatch.username, "and", currentUser.username);
-      io.to("lobby").emit(
-        "message",
-        formatMessage(
-          botName,
-          `Starting game between ${playerMatch.username} and ${currentUser.username}`
-        )
-      );
-      io.to("lobby").emit("match", playerMatch);
+      io.to(currentUser.room).emit("match", { player1: currentUser, player2: playerMatch });
     } else {
       io.to("lobby").emit(
         "message",
