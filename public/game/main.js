@@ -16,7 +16,6 @@ class initializeGame {
     this.player1 = new Player(player1.username, new Ships("player1"), this.grid1, 0);
     this.grid2 = new Grid(gridSize, cellSize, grid, "player2-grid", gridNotation);
     this.player2 = new Player(player2.username, new Ships("player2"), this.grid2, 1);
-    this.currentPlayer = this.player1;
     this.button = button;
     if (this.phase === "init") this.startShipPlacement();
   }
@@ -58,19 +57,39 @@ class initializeGame {
   // note the arrow-function to get access to this.
   #buttonPressed = (event) => {
     if (this.phase === "shipPlacement") {
-      this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-      this.currentPlayer.grid.gridElement.style.display = "grid";
+      if (socket.id === players[0].id) {
+        // draw for player1
 
-      const activeShipType = this.currentPlayer.ships.ships[this.currentPlayer.shipNumber].type;
-      statusText.textContent = `${this.currentPlayer.name}'s turn to place ${activeShipType}`;
-      // hide button
-      this.button.style.display = "none";
-      return;
+        this.player1.grid.draw(this.player1.grid.gridElement);
+        this.player1.grid.gridElement.style.display = "grid";
+
+        const activeShipType = this.player1.ships.ships[this.player1.shipNumber].type;
+        statusText.textContent = `${this.player1.name}'s turn to place ${activeShipType}`;
+        // hide button
+        this.button.style.display = "none";
+        return;
+      } else {
+        // draw for player2
+        this.player2.grid.draw(this.player2.grid.gridElement);
+        this.player2.grid.gridElement.style.display = "grid";
+
+        const activeShipType = this.player2.ships.ships[this.player2.shipNumber].type;
+        statusText.textContent = `${this.player2.name}'s turn to place ${activeShipType}`;
+        // hide button
+        this.button.style.display = "none";
+        return;
+      }
     }
     if (this.phase === "shipPlacement_completed") {
-      this.button.style.display = "none";
-      this.newPhase("gameplay");
-      return;
+      if (socket.id === players[0].id) {
+        this.button.style.display = "none";
+        socket.emit("startGamePlay", { playerId: 0 });
+        return;
+      } else {
+        this.button.style.display = "none";
+        socket.emit("startGamePlay", { playerId: 1 });
+        return;
+      }
     }
 
     if (this.phase === "gameplay") {
@@ -94,9 +113,12 @@ class initializeGame {
 
   startGamePhase() {
     this.phase = "gameplay";
-    this.player1.resetMarkers();
-    this.player2.resetMarkers();
-    this.changePlayer();
+    console.log(game.player1);
+    // console.log(this.player1, this.player2);
+    socket.id === players[0].id && this.player1.resetMarkers();
+    socket.id === players[1].id && this.player2.resetMarkers();
+    // this.player2.resetMarkers();
+    // this.changePlayer();
   }
 
   endGame() {
@@ -109,12 +131,11 @@ class initializeGame {
     // reset ships,cells, hits & markings
     this.player1.resetMarkers();
     this.player2.resetMarkers();
-    this.currentPlayer.ships.initShips();
-    this.currentPlayer.resetShip();
-    this.changePlayer();
-    this.currentPlayer.ships.initShips();
-    this.currentPlayer.resetShip();
-    this.changePlayer("player1");
+    socket.id === players[0].id && this.player1.ships.initShips();
+    socket.id === players[0].id && this.player1.resetShip();
+
+    socket.id === players[1].id && this.player2.initShips();
+    socket.id === players[1].id && this.player2.resetShip();
   }
   checkWinCondition(opponentsShips) {
     let shipSankedCount = opponentsShips.length;
@@ -128,30 +149,10 @@ class initializeGame {
     }
     return false;
   }
-  changePlayer(player) {
-    if (player) {
-      if (player === "player1") {
-        this.currentPlayer = this.player1;
-        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-        grid.style.display = "grid";
-      } else {
-        this.currentPlayer = this.player2;
-        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-        grid.style.display = "grid";
-      }
-    } else {
-      if (this.currentPlayer === this.player1) {
-        this.currentPlayer = this.player2;
-        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-        grid.style.display = "grid";
-      } else {
-        this.currentPlayer = this.player1;
-        this.currentPlayer.grid.draw(this.currentPlayer.grid.gridElement);
-        grid.style.display = "grid";
-      }
-      statusText.textContent = `${this.currentPlayer.name}'s turn`;
-    }
-  }
 }
+
+socket.on("phase", (phase) => {
+  game.newPhase(phase);
+});
 
 const game = new initializeGame(grid, btn, players[0], players[1]);

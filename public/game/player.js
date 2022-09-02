@@ -13,6 +13,7 @@ class Player {
 
   resetMarkers() {
     this.markings = {};
+    console.log("resetmarkers playerid:", this.playerId);
     const gameGridCells = this.getGameGridCells();
 
     for (let i = 0; i < gameGridCells.length; i++) {
@@ -81,11 +82,14 @@ class Player {
   }
 
   getGameGridCells() {
-    const allGridCells = this.grid.gridElement.children[this.playerId];
+    const playerGrid = document.getElementById(
+      `player${(parseInt(this.playerId) + 1).toString()}-grid`
+    );
+
     const gameGridCells = [];
-    for (let i = 0; i < allGridCells.children.length; i++) {
-      if (allGridCells.children[i].getAttribute("cellIndex")) {
-        gameGridCells.push(allGridCells.children[i]);
+    for (let i = 0; i < playerGrid.children.length; i++) {
+      if (playerGrid.children[i].getAttribute("cellIndex")) {
+        gameGridCells.push(playerGrid.children[i]);
       }
     }
     return gameGridCells;
@@ -240,17 +244,22 @@ class Player {
                   if (this.shipCells === 0) {
                     this.shipNumber++;
                     if (this.shipNumber === 5) {
-                      if (this.name === "player2") {
-                        // shipPlacement is complete
+                      statusText.textContent = `Ship placement complete!`;
 
-                        statusText.textContent = `Ship placement complete!`;
-                        game?.newPhase("shipPlacement_completed");
-                        return;
-                      } else {
-                        // first player is finished placing ships
-                        game?.changePlayer();
-                        return;
+                      if (socket.id === players[0].id) {
+                        socket.emit("shipPlacement_finished", {
+                          playerId: 0,
+                          ships: this.ships.getShipCells(),
+                        });
                       }
+                      if (socket.id === players[1].id) {
+                        socket.emit("shipPlacement_finished", {
+                          playerId: 1,
+                          ships: this.ships.getShipCells(),
+                        });
+                      }
+
+                      return;
                     }
 
                     statusText.textContent = `${this.name}'s turn to place ${

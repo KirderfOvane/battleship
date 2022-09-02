@@ -22,7 +22,6 @@ socket.on("roomUsers", ({ room, users }) => {
     outputRoomName(room);
     outputUsers(users);
   }
-  console.log(room, users);
 });
 
 // Message from server
@@ -50,13 +49,11 @@ chatForm.addEventListener("submit", (e) => {
 
 // Find Game
 findGame.addEventListener("click", (e) => {
-  console.log(username, "looking for a game");
   socket.emit("findGame", username);
 });
 
 // Listen for game match/start
 socket.on("match", ({ player1, player2 }) => {
-  console.log("starting match with players:", player1.username, player2.username);
   // Join game
   if (socket.id === player1.id) socket.emit("joinGame", { user: player1, room: "gameRoom" });
   if (socket.id === player2.id) socket.emit("joinGame", { user: player2, room: "gameRoom" });

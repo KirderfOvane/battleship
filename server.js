@@ -3,13 +3,12 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
+const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require("./utils/users");
 const {
-  userJoin,
-  getCurrentUser,
-  userLeave,
-  getRoomUsers,
-  userChangeRoom,
-} = require("./utils/users");
+  isBothPlayersFinishedWithShipPlacement,
+  setGameState,
+  isBothPlayersReadyForGamePlay,
+} = require("./utils/gameState");
 const { findGame } = require("./utils/matchMaker");
 
 const app = express();
@@ -47,7 +46,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinGame", ({ user, room }) => {
-    console.log("joinGame found:", user, room);
+    //console.log("joinGame found:", user, room);
     userLeave(user.id);
     const newUser = userJoin(user.id, user.username, room);
 
@@ -69,7 +68,7 @@ io.on("connection", (socket) => {
   // Listen for findGame click
   socket.on("findGame", () => {
     const currentUser = getCurrentUser(socket.id);
-    console.log("currentUser", currentUser);
+    //  console.log("currentUser", currentUser);
     const playerMatch = findGame(socket.id);
     if (playerMatch) {
       io.to(currentUser.room).emit("match", { player1: currentUser, player2: playerMatch });
@@ -78,6 +77,24 @@ io.on("connection", (socket) => {
         "message",
         formatMessage(botName, `${currentUser.username} is looking for a game`)
       );
+    }
+  });
+
+  // Listen for shipPlacement_finished
+  socket.on("shipPlacement_finished", ({ playerId, ships }) => {
+    setGameState(playerId, "ships", ships);
+    if (isBothPlayersFinishedWithShipPlacement()) {
+      console.log("both players is finished placing ships, moving on");
+      io.to("gameRoom").emit("phase", "shipPlacement_completed");
+    }
+  });
+
+  // Listen for game play start
+  socket.on("startGamePlay", ({ playerId }) => {
+    console.log("startgameplay", playerId);
+    setGameState(playerId, "gameplay", true);
+    if (isBothPlayersReadyForGamePlay()) {
+      io.to("gameRoom").emit("phase", "gameplay");
     }
   });
 

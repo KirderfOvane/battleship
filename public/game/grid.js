@@ -32,8 +32,10 @@ class Grid {
 
       gridElement.appendChild(gridParent);
       if (this.name === "player2-grid") {
-        gridElement.children[1].style.display = "grid";
-        gridElement.children[0].style.display = "none";
+        if (gridElement.children[1] === "player2-grid") {
+          gridElement.children[1].style.display = "grid";
+          gridElement.children[0].style.display = "none";
+        }
       }
     } else {
       // found existing gridParent,setting style to display instead of drawing
@@ -112,59 +114,65 @@ class Grid {
 
   static cellClicked = (event) => {
     const cellIndex = event.target.getAttribute("cellIndex");
-
+    let activePlayer;
+    if (socket.id === players[0].id) {
+      activePlayer = "player1";
+    } else {
+      activePlayer = "player2";
+    }
+    console.log("activePlayer:", game[activePlayer].name);
     //Gaurd: If already marked, do nothing
-    const marking = game?.currentPlayer.getMarking(cellIndex);
+    const marking = game[activePlayer].getMarking(cellIndex);
     if (marking) return;
 
     if (game?.phase === "shipPlacement") {
       // Gaurd: If possibilityMarkings exists, only accept those possibilities as cellIndex
-      const possibilityMarkings = game?.currentPlayer.possibilityMarkings;
+      const possibilityMarkings = game[activePlayer].possibilityMarkings;
       if (possibilityMarkings.length > 0 && !possibilityMarkings.includes(cellIndex)) return;
 
-      game?.currentPlayer.placeShip(cellIndex);
+      game[activePlayer].placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {
       // check that it's not next users turn
-      if (!this.lastPlayerClicked || this.lastPlayerClicked !== game?.currentPlayer.name) {
+      if (!this.lastPlayerClicked || this.lastPlayerClicked !== game[activePlayer].name) {
         // no action if cellindex is already marked
-        if (game?.currentPlayer.getMarking(cellIndex)) {
+        if (game[activePlayer].getMarking(cellIndex)) {
           return;
         }
         // set lastplayerclicked-state to be able to keep track of who's turn it is.
-        this.lastPlayerClicked = game?.currentPlayer.name;
+        this.lastPlayerClicked = game[activePlayer].name;
 
         // find out who is the opponent of the current active player
-        const opponent = game?.currentPlayer.name === "player1" ? "player2" : "player1";
-
+        const opponent = game[activePlayer].id === 0 ? "player2" : "player1";
+        console.log("opponent", opponent);
         // check if cell clicked is a hit and act
         // make the shot,which returns {isHit:boolean, sanked:boolean}
         const shot = game[opponent].ships.shot(cellIndex);
 
         if (shot.isHit) {
-          game?.currentPlayer.placeHitMarker(cellIndex);
+          game[activePlayer].placeHitMarker(cellIndex);
 
           if (shot.sanked) {
-            statusText.textContent = `${game?.currentPlayer.name} hit and sanked ship!`;
-            game?.currentPlayer.displayShipSankedMarker(
+            statusText.textContent = `${game[activePlayer].name} hit and sanked ship!`;
+            game[activePlayer].displayShipSankedMarker(
               game[opponent].ships.ships[shot.shipNumber].cells,
               shot.shipNumber
             );
             if (game?.checkWinCondition(game[opponent].ships.ships)) {
-              statusText.textContent = `${game?.currentPlayer.name} won!`;
+              statusText.textContent = `${game[activePlayer].name} won!`;
               game?.newPhase("end");
               this.hideAllGrids();
               this.lastPlayerClicked = undefined;
               return;
             }
           } else {
-            statusText.textContent = `${game?.currentPlayer.name} hit!`;
+            statusText.textContent = `${game[activePlayer].name} hit!`;
           }
           game?.displayButtonWithText("Continue");
         } else {
-          game?.currentPlayer.placeMissMarker(cellIndex);
+          game[activePlayer].placeMissMarker(cellIndex);
           game?.displayButtonWithText("Continue");
-          statusText.textContent = `${game?.currentPlayer.name} miss!`;
+          statusText.textContent = `${game[activePlayer].name} miss!`;
         }
       } else {
         this.hideAllGrids();

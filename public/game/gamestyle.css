@@ -64,9 +64,11 @@ body {
 
 #player1-grid {
   display: grid;
+  background-color: peachpuff !important;
 }
 #player2-grid {
   display: grid;
+  background-color: aqua !important;
 }
 
 #interactionBtn {
