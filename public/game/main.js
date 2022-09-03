@@ -94,7 +94,7 @@ class initializeGame {
     }
 
     if (this.phase === "gameplay") {
-      this.changePlayer();
+      socket.emit("endTurn");
     }
 
     if (this.phase === "end") {
@@ -164,11 +164,9 @@ class initializeGame {
       this.button.textContent = "Continue";
       statusText.textContent = "Your turn!";
       playerName = `player${(parseInt(this.currentPlayerId) + 1).toString()}`;
-      /*  console.log(game[playerName]);
-      console.log(game[playerName].grid);
-      console.log(game[playerName].grid.gridElement);
-      console.log(game[playerName].grid.draw(game[playerName].grid.gridElement)); */
       game[playerName].grid.draw(game[playerName].grid.gridElement);
+      console.log(game[playerName].grid.playerClicked);
+      game[playerName].grid.playerClicked = false;
     } else {
       this.button.style.display = "none";
       statusText.textContent = `Waiting for ${
@@ -180,6 +178,18 @@ class initializeGame {
 
 socket.on("phase", (phase) => {
   game.newPhase(phase);
+});
+
+socket.on("changePlayer", () => {
+  console.log(socket.id, "detected changePlayer");
+  game.changePlayer();
+});
+
+socket.on("displayGameOver", (winnerName) => {
+  console.log("winner:", winnerName);
+  statusText.textContent = `${winnerName} won!`;
+  game?.newPhase("end");
+  grid.style.display = "none";
 });
 
 const game = new initializeGame(grid, btn, players[0], players[1]);

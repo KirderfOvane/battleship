@@ -4,12 +4,12 @@ class Grid {
     this.gridSize = gridSize;
     this.cellSize = cellSize;
     this.gridElement = gridElement;
-    this.lastPlayerClicked = undefined;
+    this.playerClicked = false;
     this.gridNotation = gridNotation;
   }
   draw(gridElement) {
     let gridParent;
-    console.log("draw on gridElement:", gridElement, gridElement.children.length);
+
     if (gridElement.children.length < 1) {
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
@@ -32,25 +32,12 @@ class Grid {
       }
 
       gridElement.appendChild(gridParent);
-
-      /* if (this.name === "player2-grid") {
-        if (gridElement.children[1] === "player2-grid") {
-          gridElement.children[1].style.display = "grid";
-          gridElement.children[0].style.display = "none";
-        }
-      } */
     } else {
       console.log("found existing gridParent,showing grid");
       // found existing gridParent,setting style to display instead of drawing
       console.log(gridElement);
       gridElement.style.display = "grid";
-      /* if (gridElement.children[0].id === this.name) {
-        gridElement.children[1].style.display = "none";
-        gridElement.children[0].style.display = "grid";
-      } else {
-        gridElement.children[1].style.display = "grid";
-        gridElement.children[0].style.display = "none";
-      } */
+
       return;
     }
     let node;
@@ -139,13 +126,14 @@ class Grid {
     }
     if (game?.phase === "gameplay") {
       // check that it's not next users turn
-      if (!this.lastPlayerClicked || this.lastPlayerClicked !== game[activePlayer].name) {
+      console.log("has player clicked?", game[activePlayer].grid.playerClicked);
+      if (!game[activePlayer].grid.playerClicked) {
         // no action if cellindex is already marked
         if (game[activePlayer].getMarking(cellIndex)) {
           return;
         }
         // set lastplayerclicked-state to be able to keep track of who's turn it is.
-        this.lastPlayerClicked = game[activePlayer].name;
+        game[activePlayer].grid.playerClicked = true;
 
         // find out who is the opponent of the current active player
         const opponent = game[activePlayer].id === 0 ? "player2" : "player1";
@@ -164,10 +152,8 @@ class Grid {
               shot.shipNumber
             );
             if (game?.checkWinCondition(game[opponent].ships.ships)) {
-              statusText.textContent = `${game[activePlayer].name} won!`;
-              game?.newPhase("end");
-              this.hideAllGrids();
-              this.lastPlayerClicked = undefined;
+              socket.emit("gameWinner", { name: game[activePlayer].name });
+
               return;
             }
           } else {
@@ -184,4 +170,9 @@ class Grid {
       }
     }
   };
+
+  setPlayerClicked() {
+    console.log("setting clicked to false");
+    this.playerClicked = false;
+  }
 }

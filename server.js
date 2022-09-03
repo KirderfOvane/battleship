@@ -98,6 +98,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("endTurn", () => {
+    io.to("gameRoom").emit("changePlayer");
+  });
+
+  socket.on("gameWinner", ({ name }) => {
+    io.to("gameRoom").emit("displayGameOver", name);
+  });
+
   // Runs when client disconnects
   socket.on("disconnect", () => {
     const user = userLeave(socket.id);
