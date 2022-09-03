@@ -9,10 +9,11 @@ class Grid {
   }
   draw(gridElement) {
     let gridParent;
-
-    if (gridElement.children.length < 2) {
+    console.log("draw on gridElement:", gridElement, gridElement.children.length);
+    if (gridElement.children.length < 1) {
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
+      console.log("drawin/creating grid with id:", this.name);
       gridParent.setAttribute("class", "grid");
       if (this.gridNotation) {
         const newGridSize = this.gridSize[0] + this.cellSize;
@@ -31,21 +32,25 @@ class Grid {
       }
 
       gridElement.appendChild(gridParent);
-      if (this.name === "player2-grid") {
+
+      /* if (this.name === "player2-grid") {
         if (gridElement.children[1] === "player2-grid") {
           gridElement.children[1].style.display = "grid";
           gridElement.children[0].style.display = "none";
         }
-      }
+      } */
     } else {
+      console.log("found existing gridParent,showing grid");
       // found existing gridParent,setting style to display instead of drawing
-      if (gridElement.children[0].id === this.name) {
+      console.log(gridElement);
+      gridElement.style.display = "grid";
+      /* if (gridElement.children[0].id === this.name) {
         gridElement.children[1].style.display = "none";
         gridElement.children[0].style.display = "grid";
       } else {
         gridElement.children[1].style.display = "grid";
         gridElement.children[0].style.display = "none";
-      }
+      } */
       return;
     }
     let node;

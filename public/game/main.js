@@ -17,6 +17,7 @@ class initializeGame {
     this.grid2 = new Grid(gridSize, cellSize, grid, "player2-grid", gridNotation);
     this.player2 = new Player(player2.username, new Ships("player2"), this.grid2, 1);
     this.button = button;
+    this.currentPlayerId = 1;
     if (this.phase === "init") this.startShipPlacement();
   }
 
@@ -113,12 +114,9 @@ class initializeGame {
 
   startGamePhase() {
     this.phase = "gameplay";
-    console.log(game.player1);
-    // console.log(this.player1, this.player2);
     socket.id === players[0].id && this.player1.resetMarkers();
     socket.id === players[1].id && this.player2.resetMarkers();
-    // this.player2.resetMarkers();
-    // this.changePlayer();
+    this.changePlayer();
   }
 
   endGame() {
@@ -148,6 +146,35 @@ class initializeGame {
       }
     }
     return false;
+  }
+
+  changePlayer() {
+    //  console.log(this.currentPlayer);
+    if (this.currentPlayerId === 0) {
+      // console.log("player1 is current player,switching");
+      this.currentPlayerId = 1;
+    } else {
+      //   console.log("player2 is current player,switching..");
+      this.currentPlayerId = 0;
+    }
+    //  console.log("currentplayer:", players[this.currentPlayerId]);
+    let playerName;
+    if (socket.id === players[this.currentPlayerId].id) {
+      this.button.style.display = "inline-block";
+      this.button.textContent = "Continue";
+      statusText.textContent = "Your turn!";
+      playerName = `player${(parseInt(this.currentPlayerId) + 1).toString()}`;
+      /*  console.log(game[playerName]);
+      console.log(game[playerName].grid);
+      console.log(game[playerName].grid.gridElement);
+      console.log(game[playerName].grid.draw(game[playerName].grid.gridElement)); */
+      game[playerName].grid.draw(game[playerName].grid.gridElement);
+    } else {
+      this.button.style.display = "none";
+      statusText.textContent = `Waiting for ${
+        players[this.currentPlayerId].username
+      } to finish it turn`;
+    }
   }
 }
 
