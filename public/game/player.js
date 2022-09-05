@@ -13,7 +13,6 @@ class Player {
 
   resetMarkers() {
     this.markings = {};
-    console.log("resetmarkers playerid:", this.playerId);
     const gameGridCells = this.getGameGridCells();
 
     for (let i = 0; i < gameGridCells.length; i++) {
@@ -52,13 +51,10 @@ class Player {
   }
 
   placeShipMarker(cellIndex, type, shipCell) {
-    console.log("placeShipMarker:", cellIndex, type, shipCell);
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
-    console.log("shipTypeName:", shipTypeName);
-    console.log("shipCellLength:", shipCellLength);
-    console.log("imageNumber:", imageNumber);
+
     // image rotation is decided by the ships placement direction
     let imageRotation;
     if (game?.phase === "shipPlacement") {
@@ -67,13 +63,13 @@ class Player {
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
       // phase is gameplay,so should lookup enemy ships position.
-      console.log("playerId:", this.playerId);
+
       const opponent = this.playerId === 0 ? "player2" : "player1";
-      console.log("opponent is:", opponent, `(${game[opponent].name})`);
+
       const opponentShip = game[opponent].ships.ships[type];
-      console.log("opponents ships is:", opponentShip);
+
       imageRotation = opponentShip.direction;
-      console.log("imageRotation:", imageRotation);
+
       imageNumber === 2 && this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
     }
 
@@ -101,10 +97,8 @@ class Player {
   }
 
   displayShipSankedMarker(shipIndexes, shipNum) {
-    console.log("shipsSanked:", shipIndexes, shipNum);
     // on each index of the ship placeShipMarker
     for (let i = 0; i < shipIndexes.length; i++) {
-      console.log("loop", shipIndexes[i], shipNum, i);
       this.placeShipMarker(shipIndexes[i], shipNum, i);
     }
   }
@@ -174,7 +168,6 @@ class Player {
       // Beware: it is checking for false, but integer 0 also interprets as false.
       // So if extrapolatedGridPoint is not converted to string before it will take 0 as false.
       if (extrapolatedGridPoint === false) {
-        console.log("FOUND OUT OF GRID-BOUNDS", direction);
         collision = true;
         return;
       }
@@ -211,7 +204,6 @@ class Player {
         const test = restOfShipCells.filter((v) => v >= xRanges[i - 1] && v < xRanges[i]);
 
         if (test.length !== restOfShipCells.length) {
-          console.log("Out of x-bounds!", restOfShipCells.length - test.length);
           isOutOfXbounds = true;
         }
         return isOutOfXbounds;
@@ -226,7 +218,6 @@ class Player {
   placeShip(cellIndex) {
     const cells = this.ships.getShipCells()[this.shipNumber];
     const activeShip = this.ships.ships[this.shipNumber];
-    console.log(this.playerId, cells, activeShip, this.ships.owner);
 
     // Gaurd logic that verifies cellIndex is adjacent to rest of indexes. After second
     // cellIndex in one ship the direction of the ship is also decided and all other indexes in
@@ -290,7 +281,6 @@ class Player {
 
       this.#findAndDrawAllPossiblePlacements(cellIndex, activeShip);
       if (this.possibilities.length === 0) {
-        console.log("there are no possibility to place this type of ship here!");
         // we need to remove the click from shipcells
         this.ships.removeShipCell(this.shipNumber, this.shipCells, cellIndex);
         return;

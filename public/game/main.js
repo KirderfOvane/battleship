@@ -136,7 +136,6 @@ class initializeGame {
   }
 
   displayExitGame(player) {
-    console.log(player, "exiting game");
     // display game
     if (player.id === socket.id) {
       chat.style.display = "block";
@@ -144,7 +143,6 @@ class initializeGame {
       gameDiv.style.display = "none";
     }
     players.filter((p) => p.id === player.id);
-    console.log("player left:", players);
   }
 
   checkWinCondition(opponentsShips) {
@@ -161,15 +159,12 @@ class initializeGame {
   }
 
   changePlayer() {
-    //  console.log(this.currentPlayer);
     if (this.currentPlayerId === 0) {
-      // console.log("player1 is current player,switching");
       this.currentPlayerId = 1;
     } else {
-      //   console.log("player2 is current player,switching..");
       this.currentPlayerId = 0;
     }
-    //  console.log("currentplayer:", players[this.currentPlayerId]);
+
     let playerName;
     if (socket.id === players[this.currentPlayerId].id) {
       this.button.style.display = "inline-block";
@@ -177,7 +172,7 @@ class initializeGame {
       statusText.textContent = "Your turn!";
       playerName = `player${(parseInt(this.currentPlayerId) + 1).toString()}`;
       game[playerName].grid.draw(game[playerName].grid.gridElement);
-      console.log(game[playerName].grid.playerClicked);
+
       game[playerName].grid.playerClicked = false;
     } else {
       this.button.style.display = "none";
@@ -190,33 +185,20 @@ class initializeGame {
 
 socket.on("phase", (object) => {
   if (object.phase === "shipPlacement_completed") {
-    console.log(object.gameState);
     if (socket.id === players[0].id) {
-      console.log("updating player1 socket");
-      console.log("ships before:", game.player2.ships);
-      console.log("new ships from state:", object.gameState[1].ships);
       game.player2.ships.replaceAllShipData(object.gameState[1].ships);
-
-      console.log("player2 ships after:", game.player2.ships);
     } else {
-      console.log("updating player2 socket");
-      console.log("ships before:", game.player1.ships.getShipCells());
-
       game.player1.ships.replaceAllShipData(object.gameState[0].ships);
-      //game.player1.ships.replaceAllShipCells(object.gameState[0].ships);
-      console.log("player1 ships after:", game.player1.ships);
     }
   }
   game.newPhase(object.phase);
 });
 
 socket.on("changePlayer", () => {
-  console.log(socket.id, "detected changePlayer");
   game.changePlayer();
 });
 
 socket.on("displayGameOver", (winnerName) => {
-  console.log("winner:", winnerName);
   statusText.textContent = `${winnerName} won!`;
   game?.newPhase("end");
   grid.style.display = "none";

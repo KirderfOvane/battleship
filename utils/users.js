@@ -28,7 +28,7 @@ function getCurrentUser(id) {
 // User leaves cat
 function userLeave(id) {
   const index = users.findIndex((user) => user.id === id);
-  //console.log("user left:", users[index]);
+
   if (index !== -1) {
     return users.splice(index, 1)[0];
   }
@@ -37,7 +37,6 @@ function userLeave(id) {
 // Get room users
 function getRoomUsers(room) {
   return users;
-  // return users.filter((user) => user.room === room);
 }
 
 module.exports = {

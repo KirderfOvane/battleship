@@ -47,12 +47,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinGame", ({ user, room }) => {
-    //console.log("joinGame found:", user, room);
     userLeave(user.id);
     const newUser = userJoin(user.id, user.username, room);
 
     socket.join(room);
-    // io.to("gameRoom").emit("startGame");
+
     // Send users and room info to lobby
     io.to("lobby").emit("roomUsers", {
       room: "lobby",
@@ -61,12 +60,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("exitGame", ({ user, room }) => {
-    console.log("exitGame found:", user, room);
     userLeave(user.id);
     const newUser = userJoin(user.id, user.username, room);
 
     socket.join(room);
-    // io.to("gameRoom").emit("startGame");
+
     // Send users and room info to lobby
     io.to("lobby").emit("roomUsers", {
       room: "lobby",
@@ -83,7 +81,7 @@ io.on("connection", (socket) => {
   // Listen for findGame click
   socket.on("findGame", () => {
     const currentUser = getCurrentUser(socket.id);
-    //  console.log("currentUser", currentUser);
+
     const playerMatch = findGame(socket.id);
     if (playerMatch) {
       io.to(currentUser.room).emit("match", { player1: currentUser, player2: playerMatch });
@@ -99,7 +97,6 @@ io.on("connection", (socket) => {
   socket.on("shipPlacement_finished", ({ playerId, ships }) => {
     setGameState(playerId, "ships", ships);
     if (isBothPlayersFinishedWithShipPlacement()) {
-      console.log("both players is finished placing ships, moving on");
       io.to("gameRoom").emit("phase", {
         phase: "shipPlacement_completed",
         gameState: getGameState(),
@@ -109,7 +106,6 @@ io.on("connection", (socket) => {
 
   // Listen for game play start
   socket.on("startGamePlay", ({ playerId }) => {
-    console.log("startgameplay", playerId);
     setGameState(playerId, "gameplay", true);
     if (isBothPlayersReadyForGamePlay()) {
       io.to("gameRoom").emit("phase", { phase: "gameplay" });

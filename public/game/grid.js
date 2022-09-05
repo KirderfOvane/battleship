@@ -13,7 +13,7 @@ class Grid {
     if (gridElement.children.length < 1) {
       gridParent = document.createElement("div");
       gridParent.setAttribute("id", this.name);
-      console.log("drawin/creating grid with id:", this.name);
+
       gridParent.setAttribute("class", "grid");
       if (this.gridNotation) {
         const newGridSize = this.gridSize[0] + this.cellSize;
@@ -33,9 +33,7 @@ class Grid {
 
       gridElement.appendChild(gridParent);
     } else {
-      console.log("found existing gridParent,showing grid");
       // found existing gridParent,setting style to display instead of drawing
-      console.log(gridElement);
       gridElement.style.display = "grid";
 
       return;
@@ -105,8 +103,6 @@ class Grid {
   }
 
   static cellClicked = (event) => {
-    console.log("player1 ships:", game["player1"].ships.getShipCells());
-    console.log("player2 ships:", game["player2"].ships.getShipCells());
     const cellIndex = event.target.getAttribute("cellIndex");
     let activePlayer;
     if (socket.id === players[0].id) {
@@ -114,7 +110,7 @@ class Grid {
     } else {
       activePlayer = "player2";
     }
-    console.log("activePlayer:", game[activePlayer].name);
+
     //Gaurd: If already marked, do nothing
     const marking = game[activePlayer].getMarking(cellIndex);
     if (marking) return;
@@ -128,7 +124,7 @@ class Grid {
     }
     if (game?.phase === "gameplay") {
       // if player has already clicked its time to switch player turn
-      console.log("has player clicked?", game[activePlayer].grid.playerClicked);
+
       if (!game[activePlayer].grid.playerClicked) {
         // no action if cellindex is already marked
         if (game[activePlayer].getMarking(cellIndex)) {
@@ -139,8 +135,7 @@ class Grid {
 
         // find out who is the opponent of the current active player
         const opponent = game[activePlayer].playerId === 0 ? "player2" : "player1";
-        console.log(`opponent(${game[opponent].name}) ships:`, game[opponent].ships);
-        console.log("player ships:", game[activePlayer].ships);
+
         // check if cell clicked is a hit and act
         // make the shot,which returns {isHit:boolean, sanked:boolean}
         const shot = game[opponent].ships.shot(cellIndex);
@@ -175,7 +170,6 @@ class Grid {
   };
 
   setPlayerClicked() {
-    console.log("setting clicked to false");
     this.playerClicked = false;
   }
 }
