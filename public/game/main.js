@@ -176,8 +176,24 @@ class initializeGame {
   }
 }
 
-socket.on("phase", (phase) => {
-  game.newPhase(phase);
+socket.on("phase", (object) => {
+  if (object.phase === "shipPlacement_completed") {
+    console.log(object.gameState);
+    if (socket.id === players[0].id) {
+      console.log("ships before:", game.player2.ships);
+      console.log("new ships from state:", object.gameState[1].ships);
+      game.player2.ships.replaceAllShipData(object.gameState[1].ships);
+
+      console.log("player2 ships after:", game.player2.ships);
+    } else {
+      console.log("ships before:", game.player1.ships.getShipCells());
+
+      game.player1.ships.replaceAllShipData(object.gameState[0].ships);
+      //game.player1.ships.replaceAllShipCells(object.gameState[0].ships);
+      console.log("player1 ships after:", game.player1.ships);
+    }
+  }
+  game.newPhase(object.phase);
 });
 
 socket.on("changePlayer", () => {

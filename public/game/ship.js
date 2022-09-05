@@ -77,6 +77,22 @@ class Ships {
   setShipCell(shipNumber, cell, newValue) {
     this.ships[shipNumber].cells[cell] = newValue;
   }
+  replaceAllShipData(newShips) {
+    /* for (let i = this.ships.length - 1; i >= 0; i--) {
+      this.ships[i].cells = newShips.ships[i].cells;
+      this.ships[i].direction = newShips.ships[i].direction;
+    } */
+    newShips.ships.map((ship, index) => {
+      console.log(ship, ship.cells, ship.direction);
+      this.ships[index].direction = ship.direction;
+      ship.cells.map((cellValue, cellIndex) => this.setShipCell(index, cellIndex, cellValue));
+    });
+    /*  this.ships.carrier = newShips.carrier;
+    this.ships.battleship = newShips.battleship;
+    this.ships.cruiser = newShips.cruiser;
+    this.ships.submarine = newShips.submarine;
+    this.ships.destroyer = newShips.destroyer; */
+  }
   removeShipCell(shipNumber, cell) {
     this.ships[shipNumber].cells[cell] = "-1";
   }

@@ -52,10 +52,13 @@ class Player {
   }
 
   placeShipMarker(cellIndex, type, shipCell) {
+    console.log("placeShipMarker:", cellIndex, type, shipCell);
     const shipTypeName = this.ships.ships[type].type;
     const shipCellLength = this.ships.ships[type].cells.length;
     const imageNumber = this.ships.ships[type].cells.length - shipCell;
-
+    console.log("shipTypeName:", shipTypeName);
+    console.log("shipCellLength:", shipCellLength);
+    console.log("imageNumber:", imageNumber);
     // image rotation is decided by the ships placement direction
     let imageRotation;
     if (game?.phase === "shipPlacement") {
@@ -64,11 +67,13 @@ class Player {
         this.adjustFirstShipCellRotation(this.ships.ships[type], type, shipCellLength);
     } else {
       // phase is gameplay,so should lookup enemy ships position.
-      const opponent = this.name === "player1" ? "player2" : "player1";
+      console.log("playerId:", this.playerId);
+      const opponent = this.playerId === 0 ? "player2" : "player1";
+      console.log("opponent is:", opponent, `(${game[opponent].name})`);
       const opponentShip = game[opponent].ships.ships[type];
-
+      console.log("opponents ships is:", opponentShip);
       imageRotation = opponentShip.direction;
-
+      console.log("imageRotation:", imageRotation);
       imageNumber === 2 && this.adjustFirstShipCellRotation(opponentShip, type, shipCellLength);
     }
 
@@ -96,8 +101,10 @@ class Player {
   }
 
   displayShipSankedMarker(shipIndexes, shipNum) {
+    console.log("shipsSanked:", shipIndexes, shipNum);
     // on each index of the ship placeShipMarker
     for (let i = 0; i < shipIndexes.length; i++) {
+      console.log("loop", shipIndexes[i], shipNum, i);
       this.placeShipMarker(shipIndexes[i], shipNum, i);
     }
   }
@@ -219,6 +226,7 @@ class Player {
   placeShip(cellIndex) {
     const cells = this.ships.getShipCells()[this.shipNumber];
     const activeShip = this.ships.ships[this.shipNumber];
+    console.log(this.playerId, cells, activeShip, this.ships.owner);
 
     // Gaurd logic that verifies cellIndex is adjacent to rest of indexes. After second
     // cellIndex in one ship the direction of the ship is also decided and all other indexes in
@@ -249,13 +257,13 @@ class Player {
                       if (socket.id === players[0].id) {
                         socket.emit("shipPlacement_finished", {
                           playerId: 0,
-                          ships: this.ships.getShipCells(),
+                          ships: this.ships,
                         });
                       }
                       if (socket.id === players[1].id) {
                         socket.emit("shipPlacement_finished", {
                           playerId: 1,
-                          ships: this.ships.getShipCells(),
+                          ships: this.ships,
                         });
                       }
 

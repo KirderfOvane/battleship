@@ -27,7 +27,7 @@ function setGameState(playerId, key, value) {
 }
 
 function getGameState() {
-  console.log(gameState);
+  return gameState;
 }
 
 function getPlayerGameState(playerId) {

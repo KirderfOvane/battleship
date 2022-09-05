@@ -105,6 +105,8 @@ class Grid {
   }
 
   static cellClicked = (event) => {
+    console.log("player1 ships:", game["player1"].ships.getShipCells());
+    console.log("player2 ships:", game["player2"].ships.getShipCells());
     const cellIndex = event.target.getAttribute("cellIndex");
     let activePlayer;
     if (socket.id === players[0].id) {
@@ -125,19 +127,20 @@ class Grid {
       game[activePlayer].placeShip(cellIndex);
     }
     if (game?.phase === "gameplay") {
-      // check that it's not next users turn
+      // if player has already clicked its time to switch player turn
       console.log("has player clicked?", game[activePlayer].grid.playerClicked);
       if (!game[activePlayer].grid.playerClicked) {
         // no action if cellindex is already marked
         if (game[activePlayer].getMarking(cellIndex)) {
           return;
         }
-        // set lastplayerclicked-state to be able to keep track of who's turn it is.
+        // set playerClicked-state to be able to keep track of click's.you only get to click once.
         game[activePlayer].grid.playerClicked = true;
 
         // find out who is the opponent of the current active player
-        const opponent = game[activePlayer].id === 0 ? "player2" : "player1";
-        console.log("opponent", opponent);
+        const opponent = game[activePlayer].playerId === 0 ? "player2" : "player1";
+        console.log(game[opponent].name, "opponents ships:", game[opponent].ships);
+        console.log("player ships:", game[activePlayer].ships);
         // check if cell clicked is a hit and act
         // make the shot,which returns {isHit:boolean, sanked:boolean}
         const shot = game[opponent].ships.shot(cellIndex);

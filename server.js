@@ -8,6 +8,7 @@ const {
   isBothPlayersFinishedWithShipPlacement,
   setGameState,
   isBothPlayersReadyForGamePlay,
+  getGameState,
 } = require("./utils/gameState");
 const { findGame } = require("./utils/matchMaker");
 
@@ -85,7 +86,10 @@ io.on("connection", (socket) => {
     setGameState(playerId, "ships", ships);
     if (isBothPlayersFinishedWithShipPlacement()) {
       console.log("both players is finished placing ships, moving on");
-      io.to("gameRoom").emit("phase", "shipPlacement_completed");
+      io.to("gameRoom").emit("phase", {
+        phase: "shipPlacement_completed",
+        gameState: getGameState(),
+      });
     }
   });
 
@@ -94,7 +98,7 @@ io.on("connection", (socket) => {
     console.log("startgameplay", playerId);
     setGameState(playerId, "gameplay", true);
     if (isBothPlayersReadyForGamePlay()) {
-      io.to("gameRoom").emit("phase", "gameplay");
+      io.to("gameRoom").emit("phase", { phase: "gameplay" });
     }
   });
 
