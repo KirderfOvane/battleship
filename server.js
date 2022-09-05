@@ -60,6 +60,20 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("exitGame", ({ user, room }) => {
+    console.log("exitGame found:", user, room);
+    userLeave(user.id);
+    const newUser = userJoin(user.id, user.username, room);
+
+    socket.join(room);
+    // io.to("gameRoom").emit("startGame");
+    // Send users and room info to lobby
+    io.to("lobby").emit("roomUsers", {
+      room: "lobby",
+      users: getRoomUsers("lobby"),
+    });
+  });
+
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);

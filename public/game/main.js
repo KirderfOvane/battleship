@@ -98,7 +98,7 @@ class initializeGame {
     }
 
     if (this.phase === "end") {
-      this.resetGame();
+      this.exitGame();
     }
     if (this.phase === "init") {
       this.newPhase("init");
@@ -121,20 +121,32 @@ class initializeGame {
 
   endGame() {
     this.phase = "end";
-    this.displayButtonWithText("Restart Game");
+    this.displayButtonWithText("Exit to Game Lobby");
   }
 
-  resetGame() {
-    this.phase = "init";
-    // reset ships,cells, hits & markings
-    this.player1.resetMarkers();
-    this.player2.resetMarkers();
-    socket.id === players[0].id && this.player1.ships.initShips();
-    socket.id === players[0].id && this.player1.resetShip();
-
-    socket.id === players[1].id && this.player2.initShips();
-    socket.id === players[1].id && this.player2.resetShip();
+  exitGame() {
+    if (socket.id === players[0].id) {
+      socket.emit("exitGame", { user: players[0], room: "lobby" });
+      this.displayExitGame(players[0]);
+    }
+    if (socket.id === players[1].id) {
+      socket.emit("exitGame", { user: players[1], room: "lobby" });
+      this.displayExitGame(players[1]);
+    }
   }
+
+  displayExitGame(player) {
+    console.log(player, "exiting game");
+    // display game
+    if (player.id === socket.id) {
+      chat.style.display = "block";
+      const gameDiv = document.getElementById("game");
+      gameDiv.style.display = "none";
+    }
+    players.filter((p) => p.id === player.id);
+    console.log("player left:", players);
+  }
+
   checkWinCondition(opponentsShips) {
     let shipSankedCount = opponentsShips.length;
     for (let i = 0; i < opponentsShips.length; i++) {
@@ -180,12 +192,14 @@ socket.on("phase", (object) => {
   if (object.phase === "shipPlacement_completed") {
     console.log(object.gameState);
     if (socket.id === players[0].id) {
+      console.log("updating player1 socket");
       console.log("ships before:", game.player2.ships);
       console.log("new ships from state:", object.gameState[1].ships);
       game.player2.ships.replaceAllShipData(object.gameState[1].ships);
 
       console.log("player2 ships after:", game.player2.ships);
     } else {
+      console.log("updating player2 socket");
       console.log("ships before:", game.player1.ships.getShipCells());
 
       game.player1.ships.replaceAllShipData(object.gameState[0].ships);

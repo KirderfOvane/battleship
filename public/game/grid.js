@@ -139,7 +139,7 @@ class Grid {
 
         // find out who is the opponent of the current active player
         const opponent = game[activePlayer].playerId === 0 ? "player2" : "player1";
-        console.log(game[opponent].name, "opponents ships:", game[opponent].ships);
+        console.log(`opponent(${game[opponent].name}) ships:`, game[opponent].ships);
         console.log("player ships:", game[activePlayer].ships);
         // check if cell clicked is a hit and act
         // make the shot,which returns {isHit:boolean, sanked:boolean}

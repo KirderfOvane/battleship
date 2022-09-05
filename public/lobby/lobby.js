@@ -87,6 +87,7 @@ function startGame(player1, player2) {
   if (player1.id === socket.id || player2.id === socket.id) {
     chat.style.display = "none";
     const div = document.createElement("div");
+    div.setAttribute("id", "game");
     div.innerHTML = ` <h1>Battleship</h1>
     <h2 id="statusText"></h2>
     <div id="grid"></div>
