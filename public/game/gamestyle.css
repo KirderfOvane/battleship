@@ -1,7 +1,12 @@
 body {
-  background: darkgray;
+  background: rgb(62 70 81);
   text-align: center;
   margin: auto;
+  color: #f0f8ffeb;
+}
+
+h1 {
+  margin: 1rem;
 }
 
 .grid {
@@ -14,7 +19,8 @@ body {
 #cell {
   width: 50px;
   height: 50px;
-  border: 1px solid gray;
+  border: 1px solid rgb(255 255 255 / 17%);
+  color: #f0f8ffb5;
   cursor: pointer;
   font-size: 18px;
   text-align: center;
@@ -22,7 +28,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: rgb(10 45 243 / 79%);
+}
+#cell:hover {
+  background-color: rgb(10 45 243 / 55%);
+  border-radius: 1rem;
 }
 
 #notationx {
@@ -34,6 +44,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #f0f8ff79;
 }
 #notationy {
   width: 50px;
@@ -44,13 +55,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #f0f8ff79;
 }
 
 .hit {
   background-color: red !important;
+  border-radius: 2rem;
 }
 .miss {
   background-color: gray !important;
+  border-radius: 5rem;
 }
 .shipPlacement {
   background-color: green;
@@ -62,19 +76,25 @@ body {
   background-color: "inherit";
 }
 
+#statusText {
+  color: #f77e79;
+}
+
 #player1-grid {
   display: grid;
-  background-color: peachpuff !important;
+  backgsround-color: rgb(76, 157, 108) !important;
 }
 #player2-grid {
   display: grid;
-  background-color: aqua !important;
+  backgrousnd-color: aqua !important;
 }
 
 #interactionBtn {
   margin: auto;
   padding: 25px;
   cursor: pointer;
+  background-color: #cfd8ea;
+  border-radius: 0.5rem;
 }
 
 .sanked {
@@ -96,24 +116,28 @@ body {
   height: 50px;
   transform: rotate(90deg);
   font-size: 0px !important;
+  border: none !important;
 }
 .up {
   width: 50px;
   height: 50px;
   transform: rotate(-90deg);
   font-size: 0px !important;
+  border: none !important;
 }
 .right {
   width: 50px;
   height: 50px;
   font-size: 0px !important;
+  border: none !important;
 }
 .left {
   width: 50px;
   height: 50px;
   transform: rotate(180deg);
   font-size: 0px !important;
+  border: none !important;
 }
 .possibilites {
-  background-color: cadetblue !important;
+  background-color: #293b75 !important;
 }
